@@ -4,6 +4,7 @@
 #include "HandManager.h"
 #include "Yarn.h"
 #include "SpriteComponent.h"
+#include "SDLComponent.h"
 #include "SDL_image.h"
 #include <iostream>
 
@@ -171,6 +172,12 @@ void Game::GenerateOutput()
 		sprite->Draw(mRenderer);
 	}
 
+	//SDL‚Ì•`‰æˆ—
+	for (auto sdl : mSDLs)
+	{
+
+	}
+
 	SDL_RenderPresent(mRenderer);
 }
 
@@ -260,6 +267,16 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 	}
 
 	return tex;
+}
+
+void Game::AddSDL(SDLComponent* sdl)
+{
+
+}
+
+void Game::RemoveSDL(SDLComponent* sdl)
+{
+
 }
 
 void Game::LoadData()

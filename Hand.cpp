@@ -44,10 +44,11 @@ void Hand::UpdateActor(float deltaTime)
 	Vector2 wristPos = socket->GetPointPosition(0);
 	SetPosition(wristPos);
 
+	//親指と人差し指の距離を計測。一定値以下なら物をつまむ時の形をしていると判断します。
 	Vector2 thumbPos = socket->GetPointPosition(4);
 	Vector2 indexPos = socket->GetPointPosition(8);
 	float TILength = (thumbPos - indexPos).Length();
 
-	bool closed = TILength < 20.0f;
-	hsc->SwitchHandSprite(closed);
+	isClosed = TILength < 20.0f;
+	hsc->SwitchHandSprite(isClosed);
 }

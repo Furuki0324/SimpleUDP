@@ -11,7 +11,23 @@ HandManager::HandManager(Game* InGame, Hand* InRightHand, Hand* InLeftHand)
 
 void HandManager::UpdateActor(float deltaTime)
 {
-	
+	Vector2 rightHandPos = rightHand->GetPosition();
+	Vector2 leftHandPos = leftHand->GetPosition();
+
+	bool isRightHandClosed = rightHand->isHandClosed();
+	bool isLeftHandClosed = leftHand->isHandClosed();
+	bool isBothHandClosed = isRightHandClosed && isLeftHandClosed;
+
+	float handsLength = (rightHandPos - leftHandPos).Length();
+
+	if (handsLength < 50)
+	{
+		if(!mYarn && isBothHandClosed) GenerateYarn();
+	}
+	else if (mYarn)
+	{
+		DestroyYarn();
+	}
 }
 
 void HandManager::GenerateYarn()

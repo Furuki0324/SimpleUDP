@@ -19,6 +19,9 @@ public:
 	void AddSprite(class SpriteComponent* sprite);
 	void RemoveSprite(class SpriteComponent* sprite);
 
+	void AddSDL(class SDLComponent* sdl);
+	void RemoveSDL(class SDLComponent* sdl);
+
 	SDL_Texture* GetTexture(const std::string& fileName);
 
 private:
@@ -33,6 +36,7 @@ private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class SpriteComponent*> mSprites;
+	std::vector<class SDLComponent*> mSDLs;
 	bool mUpdatingActors;
 
 	std::unordered_map<std::string, SDL_Texture*> mTextures;

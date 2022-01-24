@@ -26,6 +26,7 @@
     <ClInclude Include="HandManager.h" />
     <ClInclude Include="HandSpriteComponent.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="SDLComponent.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="UDPSocket.h" />
     <ClInclude Include="Yarn.h" />
@@ -39,6 +40,7 @@
     <ClCompile Include="HandSpriteComponent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="SDLComponent.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
     <ClCompile Include="Yarn.cpp" />
@@ -122,7 +124,7 @@
       <AdditionalLibraryDirectories>C:\SDL2_image-2.0.3\lib\x86;C:\SDL2-2.0.18\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "C:\SDL2-2.0.9\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
+      <Command>xcopy "C:\SDL2-2.0.18\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

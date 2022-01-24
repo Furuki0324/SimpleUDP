@@ -11,9 +11,11 @@ public:
 	~Hand();
 	void UpdateActor(float deltaTime);
 
+	bool isHandClosed() const { return isClosed; }
 	UDPSocket* GetUDPSocket();
 	
 private:
 	class HandSpriteComponent* hsc;
 	class UDPSocket* socket;
+	bool isClosed;
 };
