@@ -39,6 +39,7 @@ private:
 
 	class Hand* mRightHand;
 	class Hand* mLeftHand;
+	class HandManager* mHandManager;
 
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;

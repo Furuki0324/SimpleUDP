@@ -71,6 +71,7 @@ void UDPSocket::UDP_Receive()
 	if (n >= 1)
 	{
 		handPoints.clear();
+		fHandPoints.clear();
 
 		std::string string(buf);
 		auto offset = std::string::size_type(0);
@@ -80,8 +81,9 @@ void UDPSocket::UDP_Receive()
 		{
 			//Mediapipe‚Ì¯•Ê”Ô†(0~20)‚ÆX,YÀ•W‚ğ‚Ü‚Æ‚ß‚½ƒŠƒXƒg‚ğì¬
 			std::vector<int> point;
+			std::vector<float> fPoint;
 			std::vector<std::string> strings;
-			while (point.size() < 3)
+			while (fPoint.size() < 3)
 			{
 				auto pos = string.find(delimiter, offset);
 				std::string s = "000";
@@ -109,22 +111,25 @@ void UDPSocket::UDP_Receive()
 					}
 				}
 				int i = std::stoi(s);
+				float f = std::stof(s);
 				point.push_back(i);
+				fPoint.push_back(f);
 				strings.push_back(s);
 
 				offset = pos + delimiter_length;
 			}
-			printf("[0]%d [1]%d [2]%d\n", point[0], point[1], point[2]);
+			printf("[0]%f [1]%f [2]%f\n", fPoint[0], fPoint[1], fPoint[2]);
 			//printf("[0]%s [1]%s [2]%s\n", strings[0].c_str(), strings[1].c_str(), strings[2].c_str());
 
 			handPoints.push_back(point);
+			fHandPoints.push_back(fPoint);
 		}
 
 	}
 
 }
 
-const Vector2& UDPSocket::GetPointPosition(int index)
+const Vector2 UDPSocket::GetPointPosition(int index)
 {
 	Vector2 vec;
 
@@ -135,8 +140,12 @@ const Vector2& UDPSocket::GetPointPosition(int index)
 		return vec;
 	}
 
+	/*
 	vec.x = handPoints[index][1];
 	vec.y = handPoints[index][2];
+	*/
+	vec.x = fHandPoints[index][1];
+	vec.y = fHandPoints[index][2];
 
 	return vec;
 }

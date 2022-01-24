@@ -17,7 +17,7 @@ public:
 
 	bool Init();
 	void UDP_Receive();
-	const Vector2& GetPointPosition(int index);
+	const Vector2 GetPointPosition(int index);
 
 private:
 	WSADATA wsaData;
@@ -25,6 +25,7 @@ private:
 	struct sockaddr_in addr;
 	u_short port;
 	std::vector<std::vector<int>> handPoints;
+	std::vector<std::vector<float>> fHandPoints;
 	char buf[2048] = {};
 	char delimiter;
 	size_t delimiter_length;

@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Actor.h"
 #include "Hand.h"
+#include "HandManager.h"
 #include "Yarn.h"
 #include "SpriteComponent.h"
 #include "SDL_image.h"
@@ -9,6 +10,9 @@
 Game::Game()
 	:mWindow(nullptr)
 	,mRenderer(nullptr)
+	,mRightHand(nullptr)
+	,mLeftHand(nullptr)
+	,mHandManager(nullptr)
 	,mIsRunning(true)
 	,mUpdatingActors(false)
 {
@@ -266,6 +270,7 @@ void Game::LoadData()
 	mLeftHand = new Hand(this, 50002, false);
 	mLeftHand->SetPosition(Vector2(140.0f, 200.0f));
 
+	mHandManager = new HandManager(this, mRightHand, mLeftHand);
 }
 
 void Game::UnloadData()
