@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Actor.h"
 #include "Hand.h"
+#include "Body.h"
 #include "HandManager.h"
 #include "Yarn.h"
 #include "SpriteComponent.h"
@@ -281,13 +282,15 @@ void Game::RemoveSDL(SDLComponent* sdl)
 
 void Game::LoadData()
 {
-	mRightHand = new Hand(this, 50001, true);
+	/*mRightHand = new Hand(this, 50001, true);
 	mRightHand->SetPosition(Vector2(500.0f, 200.0f));
 
 	mLeftHand = new Hand(this, 50002, false);
 	mLeftHand->SetPosition(Vector2(140.0f, 200.0f));
 
-	mHandManager = new HandManager(this, mRightHand, mLeftHand);
+	mHandManager = new HandManager(this, mRightHand, mLeftHand);*/
+
+	mBody = new Body(this, 50001);
 }
 
 void Game::UnloadData()

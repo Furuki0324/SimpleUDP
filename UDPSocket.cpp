@@ -61,7 +61,7 @@ bool UDPSocket::Init(bool blocking)
 
 void UDPSocket::Update(float deltaTime)
 {
-
+	UDP_Receive();
 }
 
 void UDPSocket::UDP_Receive()
