@@ -4,7 +4,7 @@ Yarn::Yarn(Game* InGame, HandManager* InHm)
 	:Actor(InGame)
 	,hm(InHm)
 {
-	mSDL = new SDLComponent(this, this);
+	mSDL = new YarnSDLComponent(this);
 }
 
 Yarn::~Yarn()

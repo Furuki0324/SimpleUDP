@@ -1,13 +1,13 @@
 #include "UDPSocket.h"
 #include <iostream>
 
-UDPSocket::UDPSocket(Actor* owner, u_short inPort)
+UDPSocket::UDPSocket(Actor* owner, u_short inPort, bool blocking = false)
 	:Component(owner)
 	,port(inPort)
 	,delimiter(',')
 	,delimiter_length(std::string::size_type(1))
 {
-	if (!Init())
+	if (!Init(blocking))
 	{
 		printf("Error has occured in UDPSocket.\n");
 		mOwner->SetState(Actor::State::EPaused);
@@ -17,7 +17,7 @@ UDPSocket::UDPSocket(Actor* owner, u_short inPort)
 UDPSocket::~UDPSocket()
 {}
 
-bool UDPSocket::Init()
+bool UDPSocket::Init(bool blocking)
 {
 	int iResult;
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -40,27 +40,28 @@ bool UDPSocket::Init()
 
 	bind(sock, (struct sockaddr*)&addr, sizeof(addr));
 
-	//recvのブロッキングを解除
-	u_long val = 1;
-	iResult = ioctlsocket(sock, FIONBIO, &val);
-	if (iResult != NO_ERROR)
+	if (!blocking)
 	{
-		printf("ioctlsocket failed with error: %ld\n", iResult);
+		//recvのブロッキングを解除
+		u_long val = 1;
+		iResult = ioctlsocket(sock, FIONBIO, &val);
+		if (iResult != NO_ERROR)
+		{
+			printf("ioctlsocket failed with error: %ld\n", iResult);
+		}
+		else
+		{
+			printf("Unlock blocking");
+		}
 	}
-	else
-	{
-		printf("Unlock blocking");
-	}
+
 
 	return true;
 }
 
 void UDPSocket::Update(float deltaTime)
 {
-	//recvのブロッキングを解除
-	u_long val = 1;
-	int iResult = ioctlsocket(sock, FIONBIO, &val);
-	UDP_Receive();
+
 }
 
 void UDPSocket::UDP_Receive()
@@ -70,82 +71,6 @@ void UDPSocket::UDP_Receive()
 
 	if (n >= 1)
 	{
-		handPoints.clear();
-		fHandPoints.clear();
-
-		std::string string(buf);
-		auto offset = std::string::size_type(0);
-
-		//21箇所の座標リストを作成
-		while (handPoints.size() < 21)
-		{
-			//Mediapipeの識別番号(0~20)とX,Y座標をまとめたリストを作成
-			std::vector<int> point;
-			std::vector<float> fPoint;
-			std::vector<std::string> strings;
-			while (fPoint.size() < 3)
-			{
-				auto pos = string.find(delimiter, offset);
-				std::string s = "000";
-				if (pos != std::string::npos)
-				{
-					//delimiterで指定した文字で区切る
-					s = string.substr(offset, pos - offset);
-
-					//区切ったstringに数字以外の記号が入っていたら削除する
-					size_t c;
-					while ((c = s.find_first_of("[]")) != std::string::npos)
-					{
-						s.erase(c, 1);
-					}
-				}
-				else if (handPoints.size() == 20)
-				{
-					//最後の項目（21番目の[2]）はコンマが無いため特例
-					s = string.substr(offset);
-
-					size_t c;
-					while ((c = s.find_first_of("[]")) != std::string::npos)
-					{
-						s.erase(c, 1);
-					}
-				}
-				int i = std::stoi(s);
-				float f = std::stof(s);
-				point.push_back(i);
-				fPoint.push_back(f);
-				strings.push_back(s);
-
-				offset = pos + delimiter_length;
-			}
-			printf("[0]%f [1]%f [2]%f\n", fPoint[0], fPoint[1], fPoint[2]);
-			//printf("[0]%s [1]%s [2]%s\n", strings[0].c_str(), strings[1].c_str(), strings[2].c_str());
-
-			handPoints.push_back(point);
-			fHandPoints.push_back(fPoint);
-		}
-
+		printf("%s", buf);
 	}
-
-}
-
-const Vector2 UDPSocket::GetPointPosition(int index)
-{
-	Vector2 vec;
-
-	if (handPoints.empty())
-	{
-		vec.x = 0;
-		vec.y = 0;
-		return vec;
-	}
-
-	/*
-	vec.x = handPoints[index][1];
-	vec.y = handPoints[index][2];
-	*/
-	vec.x = fHandPoints[index][1];
-	vec.y = fHandPoints[index][2];
-
-	return vec;
 }

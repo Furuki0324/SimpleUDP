@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "SpriteComponent.h"
 #include "HandSpriteComponent.h"
+#include "HandUDPComponent.h"
 #include "UDPSocket.h"
 
 class Hand :public Actor
@@ -16,6 +17,6 @@ public:
 	
 private:
 	class HandSpriteComponent* hsc;
-	class UDPSocket* socket;
+	class HandUDPComponent* udpComponent;
 	bool isClosed;
 };

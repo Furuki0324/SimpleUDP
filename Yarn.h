@@ -3,7 +3,7 @@
 #include "Actor.h"
 #include "HandManager.h"
 #include "Game.h"
-#include "SDLComponent.h"
+#include "YarnSDLComponent.h"
 
 class Yarn : public Actor
 {
@@ -16,6 +16,6 @@ public:
 	HandManager* GetHandManager() const { return hm; }
 
 private:
-	SDLComponent* mSDL;
+	YarnSDLComponent* mSDL;
 	HandManager* hm;
 };

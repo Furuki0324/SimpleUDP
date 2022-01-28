@@ -8,15 +8,12 @@
 class SDLComponent : public Component
 {
 public:
-	SDLComponent(class Actor* owner, class Yarn* yarn, int drawOrder = 100);
+	SDLComponent(class Actor* owner, int drawOrder = 100);
 
-	void Draw(SDL_Renderer* renderer);
-	void DrawLine(SDL_Renderer* renderer, float x1, float y1, float x2, float y2);
-	void DrawLine(SDL_Renderer* renderer, std::vector<float> handPoint);
+	virtual void Draw(SDL_Renderer* renderer);
 
 	int GetDrawOrder() const { return mDrawOrder; }
 
 private:
 	int mDrawOrder;
-	class Yarn* mYarnPtr;
 };

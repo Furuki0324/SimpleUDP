@@ -11,21 +11,19 @@
 class UDPSocket : public Component
 {
 public:
-	UDPSocket(class Actor* owner, u_short port);
+	UDPSocket(class Actor* owner, u_short port, bool blocking);
 	~UDPSocket();
 	void Update(float deltaTime) override;
 
-	bool Init();
-	void UDP_Receive();
-	const Vector2 GetPointPosition(int index);
+	bool Init(bool blocking);
+	virtual void UDP_Receive();
 
-private:
+protected:
 	WSADATA wsaData;
 	SOCKET sock;
 	struct sockaddr_in addr;
 	u_short port;
-	std::vector<std::vector<int>> handPoints;
-	std::vector<std::vector<float>> fHandPoints;
+
 	char buf[2048] = {};
 	char delimiter;
 	size_t delimiter_length;

@@ -4,9 +4,10 @@
 Hand::Hand(Game* game, int inPort, bool right)
 	:Actor(game)
 	, hsc(nullptr)
-	, socket(nullptr)
+	, udpComponent(nullptr)
 {
 	hsc = new HandSpriteComponent(this);
+	udpComponent = new HandUDPComponent(this, inPort);
 	std::vector<SDL_Texture*> texs;
 	if (right)
 	{
@@ -24,8 +25,6 @@ Hand::Hand(Game* game, int inPort, bool right)
 	}
 
 	hsc->SetHandTextures(texs);
-	
-	socket = new UDPSocket(this, inPort);
 }
 
 Hand::~Hand()
@@ -33,7 +32,7 @@ Hand::~Hand()
 
 UDPSocket* Hand::GetUDPSocket()
 {
-	return socket;
+	return udpComponent;
 }
 
 void Hand::UpdateActor(float deltaTime)
@@ -41,12 +40,12 @@ void Hand::UpdateActor(float deltaTime)
 	Actor::UpdateActor(deltaTime);
 
 	//UDPSocketから手首の座標を取得。もし手を一度も検出していなかったら（起動時など）座標0を取得します。
-	Vector2 wristPos = socket->GetPointPosition(0);
+	Vector2 wristPos = udpComponent->GetPointPosition(0);
 	SetPosition(wristPos);
 
 	//親指と人差し指の距離を計測。一定値以下なら物をつまむ時の形をしていると判断します。
-	Vector2 thumbPos = socket->GetPointPosition(4);
-	Vector2 indexPos = socket->GetPointPosition(8);
+	Vector2 thumbPos = udpComponent->GetPointPosition(4);
+	Vector2 indexPos = udpComponent->GetPointPosition(8);
 	float TILength = (thumbPos - indexPos).Length();
 
 	isClosed = TILength < 20.0f;
