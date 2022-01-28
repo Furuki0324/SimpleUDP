@@ -175,7 +175,7 @@ void Game::GenerateOutput()
 	//SDL‚Ì•`‰æˆ—
 	for (auto sdl : mSDLs)
 	{
-
+		sdl->Draw(mRenderer);
 	}
 
 	SDL_RenderPresent(mRenderer);
@@ -271,7 +271,7 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 
 void Game::AddSDL(SDLComponent* sdl)
 {
-
+	mSDLs.push_back(sdl);
 }
 
 void Game::RemoveSDL(SDLComponent* sdl)

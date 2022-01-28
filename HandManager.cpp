@@ -20,23 +20,33 @@ void HandManager::UpdateActor(float deltaTime)
 
 	float handsLength = (rightHandPos - leftHandPos).Length();
 
-	if (handsLength < 50)
+	if (handsLength > 50)
 	{
 		if(!mYarn && isBothHandClosed) GenerateYarn();
-	}
-	else if (mYarn)
-	{
-		DestroyYarn();
 	}
 }
 
 void HandManager::GenerateYarn()
 {
 	Game* game = GetGame();
-	mYarn = new Yarn(game);
+	mYarn = new Yarn(game, this);
 }
 
 void HandManager::DestroyYarn()
 {
 	mYarn->SetState(Actor::State::EDead);
+}
+
+std::vector<float> HandManager::GetHandsPosition()
+{
+	std::vector<float> vector;
+	Vector2 rightHandPos = rightHand->GetPosition();
+	Vector2 leftHandPos = leftHand->GetPosition();
+
+	vector.push_back(rightHandPos.x);
+	vector.push_back(rightHandPos.y);
+	vector.push_back(leftHandPos.x);
+	vector.push_back(leftHandPos.y);
+
+	return vector;
 }

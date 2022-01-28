@@ -14,9 +14,11 @@ public:
 	void GenerateYarn();
 	void DestroyYarn();
 
+	std::vector<float> GetHandsPosition();
+
 private:
 	Hand* rightHand;
 	Hand* leftHand;
 
-	Yarn* mYarn;
+	class Yarn* mYarn;
 };
