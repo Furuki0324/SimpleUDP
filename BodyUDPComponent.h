@@ -10,6 +10,7 @@ public:
 
 	void UDP_Receive() override;
 	const Vector2 GetPointPosition(int index);
+	std::vector<std::vector<float>> GetAllPosition();
 
 private:
 	std::vector<std::vector<float>> bodyPositions;

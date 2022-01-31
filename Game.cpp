@@ -39,8 +39,8 @@ bool Game::Initialize()
 		"MediaPipe Simple Game",
 		100,
 		100,
-		640,
-		480,
+		960,
+		720,
 		0
 	);
 
@@ -61,14 +61,6 @@ bool Game::Initialize()
 		SDL_Log("Failed to create renderer: %s", SDL_GetError());
 		return false;
 	}
-
-	//int iResult;
-	//iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	//if (iResult != 0)
-	//{
-	//	std::cout << "Failed to WSAStartup: " << iResult << std::endl;
-	//	return false;
-	//}
 
 	LoadData();
 
@@ -216,6 +208,9 @@ void Game::RemoveActor(Actor* actor)
 	}
 }
 
+/*
+* スプライトを追加。SpriteComponentのコンストラクタ―から実行される。
+*/
 void Game::AddSprite(SpriteComponent* sprite)
 {
 	int myDrawOrder = sprite->GetDrawOrder();
@@ -232,6 +227,9 @@ void Game::AddSprite(SpriteComponent* sprite)
 	mSprites.insert(iter, sprite);
 }
 
+/*
+* スプライトを削除。SpriteComponentのデストラクターから実行される。
+*/
 void Game::RemoveSprite(SpriteComponent* sprite)
 {
 	auto iter = std::find(mSprites.begin(), mSprites.end(), sprite);
@@ -270,14 +268,21 @@ SDL_Texture* Game::GetTexture(const std::string& fileName)
 	return tex;
 }
 
+/*
+* SDLを追加する。SDLComponentのコンストラクタ―から実行される。
+*/
 void Game::AddSDL(SDLComponent* sdl)
 {
 	mSDLs.push_back(sdl);
 }
 
+/*
+* SDLを削除する。SDLComponentのデストラクターから実行される。
+*/
 void Game::RemoveSDL(SDLComponent* sdl)
 {
-
+	auto iter = std::find(mSDLs.begin(), mSDLs.end(), sdl);
+	mSDLs.erase(iter);
 }
 
 void Game::LoadData()

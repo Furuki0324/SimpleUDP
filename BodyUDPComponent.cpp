@@ -81,4 +81,20 @@ void BodyUDPComponent::UDP_Receive()
 			bodyPositions.push_back(point);
 		}
 	}
+	
+}
+
+const Vector2 BodyUDPComponent::GetPointPosition(int index)
+{
+	Vector2 vec;
+
+	vec.x = 0;
+	vec.y = 0;
+
+	return vec;
+}
+
+std::vector<std::vector<float>> BodyUDPComponent::GetAllPosition()
+{
+	return bodyPositions;
 }
