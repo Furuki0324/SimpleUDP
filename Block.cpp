@@ -9,8 +9,8 @@ Block::Block(Game* game, int width, int height)
 	,physicsComponent(nullptr)
 {
 	sdlComponent = new BlockSDLComponent(this, width, height);
-	physicsComponent = new PhysicsComponent(this, 101);
-	physicsComponent->AddImpact(Vector2(50, -50));
+	physicsComponent = new PhysicsComponent(this, 101,1.0,150);
+	physicsComponent->AddImpact(Vector2(50, 0));
 }
 
 void Block::UpdateActor(float deltaTime)
@@ -18,21 +18,18 @@ void Block::UpdateActor(float deltaTime)
 	Vector2 currentPos = GetPosition();
 	Vector2 windowSize = mGame->GetWindowSize();
 
-	if(currentPos.y > windowSize.y + 100)
+	if(currentPos.y > windowSize.y)
 	{
-		currentPos.y = -50;
-		SetPosition(currentPos);
+		physicsComponent->AddImpact(Vector2(0, -300));
 	}
 	
-	if (currentPos.x < -50)
+	if (currentPos.x < 0)
 	{
-		currentPos.x = windowSize.x + 50;
-		SetPosition(currentPos);
+		physicsComponent->AddImpact(Vector2(300, 0));
 	}
-	else if (currentPos.x > windowSize.x + 50)
+	else if (currentPos.x > windowSize.x)
 	{
-		currentPos.x = -50;
-		SetPosition(currentPos);
+		physicsComponent->AddImpact(Vector2(-300, 0));
 	}
 }
 
