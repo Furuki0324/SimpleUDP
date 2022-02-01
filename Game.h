@@ -1,4 +1,5 @@
 #pragma once
+#include "Math.h"
 #include <SDL.h>
 #include <vector>
 #include <unordered_map>
@@ -8,7 +9,7 @@
 class Game
 {
 public:
-	Game();
+	Game(int windowWidth, int windowHeight);
 	bool Initialize();
 	void Shutdown();
 	void RunLoop();
@@ -24,6 +25,8 @@ public:
 
 	SDL_Texture* GetTexture(const std::string& fileName);
 
+	Vector2 GetWindowSize();
+
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -31,6 +34,7 @@ private:
 
 	void LoadData();
 	void UnloadData();
+
 
 private:
 	std::vector<class Actor*> mActors;
@@ -45,8 +49,12 @@ private:
 	class Hand* mLeftHand;
 	class HandManager* mHandManager;
 	class Body* mBody;
+	class Block* mBlock;
 
 	SDL_Window* mWindow;
+	Vector2 mWindowSize;
+	int mWindowWidth;
+	int mWindowHeight;
 	SDL_Renderer* mRenderer;
 	Uint32 mTicksCount;
 	bool mIsRunning;

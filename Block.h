@@ -4,8 +4,12 @@
 class Block : public Actor
 {
 public:
-	Block(class Game* game);
+	Block(class Game* game, int width, int height);
 	~Block();
 
-	void UpdateActor(float deltaTime);
+	void UpdateActor(float deltaTime) override;
+
+private:
+	class BlockSDLComponent* sdlComponent;
+	class PhysicsComponent* physicsComponent;
 };

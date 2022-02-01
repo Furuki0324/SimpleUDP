@@ -2,7 +2,7 @@
 
 int main(int argc, char** argv)
 {
-	Game game;
+	Game game(640,480);
 
 	bool success = game.Initialize();
 	if (success)

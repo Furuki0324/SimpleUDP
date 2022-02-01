@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Block.h" />
+    <ClInclude Include="BlockSDLComponent.h" />
     <ClInclude Include="Body.h" />
     <ClInclude Include="BodySDLComponent.h" />
     <ClInclude Include="BodyUDPComponent.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="HandSpriteComponent.h" />
     <ClInclude Include="HandUDPComponent.h" />
     <ClInclude Include="Math.h" />
+    <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="SDLComponent.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="UDPSocket.h" />
@@ -40,6 +42,7 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="BlockSDLComponent.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodySDLComponent.cpp" />
     <ClCompile Include="BodyUDPComponent.cpp" />
@@ -51,6 +54,7 @@
     <ClCompile Include="HandUDPComponent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="PhysicsComponent.cpp" />
     <ClCompile Include="SDLComponent.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="UDPSocket.cpp" />

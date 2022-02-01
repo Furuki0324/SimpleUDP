@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Hand.h"
 #include "Body.h"
+#include "Block.h"
 #include "HandManager.h"
 #include "Yarn.h"
 #include "SpriteComponent.h"
@@ -9,7 +10,7 @@
 #include "SDL_image.h"
 #include <iostream>
 
-Game::Game()
+Game::Game(int windowWidth, int windowHeight)
 	:mWindow(nullptr)
 	,mRenderer(nullptr)
 	,mRightHand(nullptr)
@@ -17,8 +18,11 @@ Game::Game()
 	,mHandManager(nullptr)
 	,mIsRunning(true)
 	,mUpdatingActors(false)
+	,mWindowWidth(windowWidth)
+	,mWindowHeight(windowHeight)
 {
-
+	mWindowSize.x = windowWidth;
+	mWindowSize.y = windowHeight;
 }
 
 bool Game::Initialize()
@@ -39,8 +43,8 @@ bool Game::Initialize()
 		"MediaPipe Simple Game",
 		100,
 		100,
-		960,
-		720,
+		mWindowSize.x,
+		mWindowSize.y,
 		0
 	);
 
@@ -285,6 +289,7 @@ void Game::RemoveSDL(SDLComponent* sdl)
 	mSDLs.erase(iter);
 }
 
+//起動時に必要なオブジェクトを配置
 void Game::LoadData()
 {
 	/*mRightHand = new Hand(this, 50001, true);
@@ -295,7 +300,10 @@ void Game::LoadData()
 
 	mHandManager = new HandManager(this, mRightHand, mLeftHand);*/
 
-	mBody = new Body(this, 50001);
+	//mBody = new Body(this, 50001);
+
+	mBlock = new Block(this, 50, 20);
+	mBlock->SetPosition(Vector2(mWindowSize.x / 2, mWindowSize.y / 2));
 }
 
 void Game::UnloadData()
@@ -310,4 +318,12 @@ void Game::UnloadData()
 		SDL_DestroyTexture(i.second);
 	}
 	mTextures.clear();
+}
+
+Vector2 Game::GetWindowSize()
+{
+	Vector2 size;
+	size.x = mWindowWidth;
+	size.y = mWindowHeight;
+	return size;
 }
