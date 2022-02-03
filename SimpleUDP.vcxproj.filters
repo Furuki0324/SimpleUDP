@@ -72,6 +72,9 @@
     <ClInclude Include="BlockSDLComponent.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -132,6 +135,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="BlockSDLComponent.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

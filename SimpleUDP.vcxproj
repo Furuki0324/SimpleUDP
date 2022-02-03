@@ -25,6 +25,7 @@
     <ClInclude Include="Body.h" />
     <ClInclude Include="BodySDLComponent.h" />
     <ClInclude Include="BodyUDPComponent.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hand.h" />
@@ -46,6 +47,7 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodySDLComponent.cpp" />
     <ClCompile Include="BodyUDPComponent.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hand.cpp" />

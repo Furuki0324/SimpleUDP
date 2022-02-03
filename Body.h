@@ -1,6 +1,6 @@
 #pragma once
 #include "Actor.h"
-
+#include "Collision.h"
 
 class Body :public Actor
 {

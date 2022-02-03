@@ -1,5 +1,6 @@
 #pragma once
 #include "Actor.h"
+#include "Collision.h"
 
 class Block : public Actor
 {

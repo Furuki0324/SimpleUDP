@@ -9,7 +9,7 @@ Body::Body(Game* game, int port)
 	,sdlComponent(nullptr)
 {
 	udpComponent = new BodyUDPComponent(this, port);
-	sdlComponent = new BodySDLComponent(this);
+	sdlComponent = new BodySDLComponent(this, game);
 }
 
 void Body::UpdateActor(float deltaTime) {}
