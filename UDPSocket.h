@@ -11,7 +11,7 @@
 class UDPSocket : public Component
 {
 public:
-	UDPSocket(class Actor* owner, u_short port, bool blocking);
+	UDPSocket(class Actor* owner, u_short port, int updateOrder, bool blocking);
 	~UDPSocket();
 	void Update(float deltaTime) override;
 

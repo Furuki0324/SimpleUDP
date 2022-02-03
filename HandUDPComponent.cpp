@@ -2,9 +2,10 @@
 #include "Actor.h"
 
 HandUDPComponent::HandUDPComponent(Actor* owner, u_short InPort)
-	:UDPSocket(owner, InPort, false)
+	:UDPSocket(owner, InPort, 1, false)
 {
-
+	//MediapipeのHandで取得する21箇所の座標データを保持するメモリを確保
+	handPositions.reserve(21);
 }
 
 void HandUDPComponent::UDP_Receive()

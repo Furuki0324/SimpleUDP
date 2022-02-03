@@ -1,8 +1,8 @@
 #include "UDPSocket.h"
 #include <iostream>
 
-UDPSocket::UDPSocket(Actor* owner, u_short inPort, bool blocking = false)
-	:Component(owner)
+UDPSocket::UDPSocket(Actor* owner, u_short inPort, int updateOrder, bool blocking = false)
+	:Component(owner, updateOrder)
 	,port(inPort)
 	,delimiter(',')
 	,delimiter_length(std::string::size_type(1))

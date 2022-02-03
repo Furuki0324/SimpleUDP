@@ -1,10 +1,24 @@
 #include "BodyUDPComponent.h"
 #include "Actor.h"
+#include <stdexcept>
 
-BodyUDPComponent::BodyUDPComponent(Actor* owner, u_short port)
-	:UDPSocket(owner, port, false)
+BodyUDPComponent::BodyUDPComponent(Actor* owner, u_short port, int updateOrder)
+	:UDPSocket(owner, port, updateOrder, false)
 {
+	//MediapipeのPoseで取得する33箇所の座標データを保持するメモリを確保
+	bodyPositions.reserve(33);
 
+	std::vector<float> v;
+	float a = 0;
+	printf("The vector size:%d", bodyPositions.capacity());
+	try
+	{
+		v = bodyPositions.at(1);
+	}
+	catch(const std::out_of_range& e)
+	{
+		printf("\x1b[41mAn error has occured.\x1b[m\n");
+	}
 }
 
 void BodyUDPComponent::UDP_Receive()
@@ -76,20 +90,30 @@ void BodyUDPComponent::UDP_Receive()
 				point.push_back(f);
 				offset = pos + delimiter_length;
 			}
-			printf("[ID]%f [X]%f, [Y]%f [Z]%f\n", point[0], point[1], point[2], point[3]);
+			//printf("[ID]%f [X]%f, [Y]%f [Z]%f\n", point[0], point[1], point[2], point[3]);
 
-			bodyPositions.push_back(point);
+			if (bodyPositions.size() < bodyPositions.max_size()) { bodyPositions.push_back(point); }
+			else { printf("\x1b[41mBodyPositions size over\x1b[m\n"); }
 		}
 	}
 	
 }
 
-const Vector2 BodyUDPComponent::GetPointPosition(int index)
+Vector2 BodyUDPComponent::GetPointPosition(int index)
 {
 	Vector2 vec;
 
-	vec.x = 0;
-	vec.y = 0;
+	try
+	{
+		vec.x = bodyPositions.at(index).at(1);
+		vec.y = bodyPositions.at(index).at(2);
+	}
+	catch (const std::out_of_range& e)
+	{
+		printf("\x1b[41mOut of bodypositions range.\x1b[m\n");
+		vec.x = 0;
+		vec.y = 0;
+	}
 
 	return vec;
 }

@@ -300,7 +300,7 @@ void Game::LoadData()
 
 	mHandManager = new HandManager(this, mRightHand, mLeftHand);*/
 
-	//mBody = new Body(this, 50001);
+	mBody = new Body(this, 50001);
 
 	mBlock = new Block(this, 50, 20);
 	mBlock->SetPosition(Vector2(mWindowSize.x / 2, mWindowSize.y / 2));

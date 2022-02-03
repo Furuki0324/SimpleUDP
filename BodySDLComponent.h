@@ -12,4 +12,8 @@ private:
 	class Body* mBodyPtr;
 	std::vector<std::vector<float>> bodyPositions;
 	class Game* mGame;
+	class BodyUDPComponent* mBodyUDP;
+
+	Vector2 rightHandPosition, leftHandPosition;
+	Vector2 rightHandVector, leftHandVector;
 };

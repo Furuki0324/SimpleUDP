@@ -8,11 +8,13 @@ Body::Body(Game* game, int port)
 	,udpComponent(nullptr)
 	,sdlComponent(nullptr)
 {
-	udpComponent = new BodyUDPComponent(this, port);
+	udpComponent = new BodyUDPComponent(this, port, 1);
 	sdlComponent = new BodySDLComponent(this, game);
 }
 
-void Body::UpdateActor(float deltaTime) {}
+void Body::UpdateActor(float deltaTime) 
+{
+}
 
 BodyUDPComponent* Body::GetUDPComponent()
 {
