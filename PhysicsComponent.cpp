@@ -47,3 +47,9 @@ void PhysicsComponent::Move(float deltaTime)
 
 	mOwner->SetPosition(ownerPos);
 }
+
+void PhysicsComponent::Bound(float e)
+{
+	if (mDirection.y < 0) { return; }
+	mDirection.y = -(mDirection.y * e);
+}

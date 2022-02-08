@@ -1,6 +1,5 @@
 #pragma once
 #include "Actor.h"
-#include "Collision.h"
 
 class Block : public Actor
 {
@@ -9,11 +8,15 @@ public:
 	~Block();
 
 	void UpdateActor(float deltaTime) override;
+	class BoxComponent* GetBoxComponent();
+	class PhysicsComponent* GetPhysicsComponent();
 
-	const std::vector<Vector2>& GetBlockCorners();
+	bool GetHit();
+	void SetHit(bool hit);
 
 private:
 	class PhysicsComponent* physicsComponent;
+	class BoxComponent* boxComponent;
 
 	float mWidth, mHeight;
 	//éùë±éûä‘

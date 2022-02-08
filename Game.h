@@ -4,7 +4,6 @@
 #pragma comment(lib, "Dwrite.lib")
 
 #include "Math.h"
-#include <SDL.h>
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -19,7 +18,6 @@ public:
 	template <class T> void SafeRelease(T** ppT);
 
 	Game();
-	bool InitializeSDL();
 	bool InitializeDirect2D();
 	void Shutdown();
 	void RunLoop();
@@ -27,17 +25,14 @@ public:
 	void AddActor(class Actor* actor);
 	void RemoveActor(class Actor* actor);
 
-	void AddSprite(class SpriteComponent* sprite);
-	void RemoveSprite(class SpriteComponent* sprite);
-
-	void AddSDL(class SDLComponent* sdl);
-	void RemoveSDL(class SDLComponent* sdl);
+	void AddBlock(class Block* block);
+	void RemoveBlock(class Block* block);
+	std::vector<class Block*>& GetBlocks();
 
 	void AddD2D(class D2DDrawComponent* d2d);
 	void RemoveD2D(class D2DDrawComponent* d2d);
 
-	SDL_Texture* GetTexture(const std::string& fileName);
-
+	const ID2D1HwndRenderTarget* GetRenderTarget();
 	Vector2 GetWindowSize();
 
 	HRESULT LoadBitmapFromFile(
@@ -52,42 +47,35 @@ public:
 private:
 	void ProcessInput();
 	void UpdateGame();
-	void GenerateOutput();
 	void GenerateOutputWithDirect2D();
 
 	void LoadData();
 	void UnloadData();
 
+	void ShowErrorMessage(const HRESULT& err);
+
 private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
-	std::vector<class SpriteComponent*> mSprites;
-	std::vector<class SDLComponent*> mSDLs;
 	std::vector<class D2DDrawComponent*> mD2Ds;
+	std::vector<class Block*> mBlocks;
 	bool mUpdatingActors;
 
-	std::unordered_map<std::string, SDL_Texture*> mTextures;
 
-	Uint32 mTicksCount;
 	bool mIsRunning;
 	float frameTime;
-	float fps;
+	float timeLimit;
 	LARGE_INTEGER timeFreq;
 	LARGE_INTEGER timeBefore;
 	LARGE_INTEGER timeNow;
+	MSG msg;
 
-	//SDLŠÖ˜A
-	SDL_Window* mWindow;
 	Vector2 mWindowSize;
-	int mWindowWidth;
-	int mWindowHeight;
-	SDL_Renderer* mRenderer;
 
 	//Direct2DŠÖ˜A
-	WNDCLASSEX windowClass;
+	struct IWICImagingFactory* pWICFactory;
 	HWND hwnd;
 	ID2D1Factory* pD2DFactory;
-	struct IWICImagingFactory* pWICFactory;
 	IDWriteFactory* pWriteFactory;
 	IDWriteTextFormat* pTextFormat;
 	ID2D1HwndRenderTarget* pRT;

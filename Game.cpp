@@ -1,18 +1,15 @@
 #include "Game.h"
 #include "Actor.h"
-#include "Hand.h"
 #include "Body.h"
 #include "Block.h"
+#include "GimmickGenerator.h"
 #include "D2DSampleBox.h"
-#include "SpriteComponent.h"
 #include "D2DDrawComponent.h"
-#include "SDLComponent.h"
-#include "SDL_image.h"
 #include <iostream>
 #include <wincodec.h>
 
-const unsigned int window_width = 640;
-const unsigned int window_height = 480;
+const unsigned int window_width = 960;
+const unsigned int window_height = 720;
 const float MIN_FRAME_TIME = 1.0f / 144;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -40,61 +37,22 @@ template <class T> void Game::SafeRelease(T** ppT)
 }
 
 Game::Game()
-	:mWindow(nullptr)
-	,mRenderer(nullptr)
-	,pD2DFactory(nullptr)
+	:pD2DFactory(nullptr)
 	,mIsRunning(true)
 	,mUpdatingActors(false)
 	,frameTime(0.0f)
+	,timeLimit(10.0f)
 {
-	mWindowSize.x = window_width;
-	mWindowSize.y = window_height;
 }
 
-bool Game::InitializeSDL()
+void Game::Shutdown()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0)
-	{
-		SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
-		return false;
-	}
+	SafeRelease(&pD2DFactory);
+	SafeRelease(&pRT);
+	SafeRelease(&pWriteFactory);
+	SafeRelease(&pTextFormat);
 
-	if (IMG_Init(IMG_INIT_PNG) == 0)
-	{
-		SDL_Log("Failed to initialize IMG: %s", SDL_GetError());
-		return false;
-	}
-
-	mWindow = SDL_CreateWindow(
-		"MediaPipe Simple Game",
-		100,
-		100,
-		mWindowSize.x,
-		mWindowSize.y,
-		0
-	);
-
-	if (mWindow == nullptr)
-	{
-		SDL_Log("Failed to create window: %s", SDL_GetError());
-		return false;
-	}
-
-	mRenderer = SDL_CreateRenderer(
-		mWindow,
-		-1,
-		SDL_RENDERER_ACCELERATED
-	);
-
-	if (mRenderer == nullptr)
-	{
-		SDL_Log("Failed to create renderer: %s", SDL_GetError());
-		return false;
-	}
-
-	mTicksCount = SDL_GetTicks();
-
-	return true;
+	std::cout << "Shutdown" << std::endl;
 }
 
 bool Game::InitializeDirect2D()
@@ -104,6 +62,8 @@ bool Game::InitializeDirect2D()
 	QueryPerformanceCounter(&timeBefore);
 
 	//ここからはDirectX2Dの起動
+	HRESULT hr = CoInitialize(NULL);
+
 	HINSTANCE hInst = GetModuleHandle(nullptr);
 	WNDCLASSEX w = {};
 	w.cbSize = sizeof(WNDCLASSEX);
@@ -131,13 +91,14 @@ bool Game::InitializeDirect2D()
 	/*
 	* ID2DFactoryの生成
 	*/
-	HRESULT hr = D2D1CreateFactory(
+	hr = D2D1CreateFactory(
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		&pD2DFactory
 	);
 	if (FAILED(hr))
 	{
 		printf("D2D1CreateFactory was failed.\n");
+		ShowErrorMessage(hr);
 		return false;
 	}
 
@@ -152,6 +113,7 @@ bool Game::InitializeDirect2D()
 	if (FAILED(hr))
 	{
 		printf("DWriteCreateFactory was failed.\n");
+		ShowErrorMessage(hr);
 		return false;
 	}
 
@@ -171,6 +133,7 @@ bool Game::InitializeDirect2D()
 	if (FAILED(hr))
 	{
 		printf("CreateTextFormat was failed.\n");
+		ShowErrorMessage(hr);
 		return false;
 	}
 
@@ -193,35 +156,32 @@ bool Game::InitializeDirect2D()
 	if (FAILED(hr))
 	{
 		printf("CreateHwndRenderTarget was failed.\n");
+		ShowErrorMessage(hr);
 		return false;
 	}
 
 	/*
 	* IWICImagingFactoryの生成
 	*/
-	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&pWICFactory));
+	hr = CoCreateInstance(
+		CLSID_WICImagingFactory,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&pWICFactory)
+	);
 	if (FAILED(hr))
 	{
 		printf("CoCreateInstance was failed.\n");
+		ShowErrorMessage(hr);
 		return false;
 	}
+
+	CoUninitialize();
 
 	return true;
 }
 
-void Game::Shutdown()
-{
-	IMG_Quit();
 
-	SDL_DestroyWindow(mWindow);
-	SDL_DestroyRenderer(mRenderer);
-	SDL_Quit();
-
-	SafeRelease(&pRT);
-	SafeRelease(&pD2DFactory);
-
-	std::cout << "Shutdown" << std::endl;
-}
 
 void Game::RunLoop()
 {
@@ -230,27 +190,25 @@ void Game::RunLoop()
 	{
 		ProcessInput();
 		UpdateGame();
-		//GenerateOutput();
 		GenerateOutputWithDirect2D();
 	}
 }
 
 void Game::ProcessInput()
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event))
+	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		switch (event.type)
+		if (msg.message == WM_QUIT)
 		{
-		case SDL_QUIT:
+			printf("WM_QUIT\n");
 			mIsRunning = false;
-			break;
 		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
-	const Uint8* state = SDL_GetKeyboardState(NULL);
 	const bool escapeState = GetKeyState(VK_ESCAPE) & 0x8000;
-	if (state[SDL_SCANCODE_ESCAPE] || escapeState)
+	if (escapeState)
 	{
 		mIsRunning = false;
 	}
@@ -259,30 +217,20 @@ void Game::ProcessInput()
 void Game::UpdateGame()
 {
 	//指定したフレーム数に到達するまで待機
-	//while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
-	//	;
 	do
 	{
 		QueryPerformanceCounter(&timeNow);
 		frameTime = (float)(timeNow.QuadPart - timeBefore.QuadPart) / (float)timeFreq.QuadPart;
 	} while (frameTime < MIN_FRAME_TIME);
 
-	//QueryPerformanceCounter(&timeEnd);
-	//frameTime = (float)(timeEnd.QuadPart - timeStart.QuadPart) / (float)timeFreq.QuadPart;
 
-	if (frameTime > 0)
-	{
-		fps = 1.0f / frameTime;
-		printf("FPS:%f\n", fps);
-	}
-	timeBefore = timeNow;
-
-	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
+	float deltaTime = frameTime;
 	if (deltaTime > 0.05f)
 	{
 		deltaTime = 0.05f;
 	}
-	mTicksCount = SDL_GetTicks();
+	timeBefore = timeNow;
+	timeLimit += deltaTime;
 
 	//全てのアクターを更新
 	mUpdatingActors = true;
@@ -315,27 +263,6 @@ void Game::UpdateGame()
 	}
 }
 
-void Game::GenerateOutput()
-{
-	//背景色を設定
-	SDL_SetRenderDrawColor(mRenderer, 255, 255, 255, 255);
-	SDL_RenderClear(mRenderer);
-
-	//登録済みのスプライトを更新して描画
-	for (auto sprite : mSprites)
-	{
-		sprite->Draw(mRenderer);
-	}
-
-	//SDLの描画処理
-	for (auto sdl : mSDLs)
-	{
-		sdl->Draw(mRenderer);
-	}
-
-	SDL_RenderPresent(mRenderer);
-}
-
 void Game::GenerateOutputWithDirect2D()
 {
 	pRT->BeginDraw();
@@ -351,7 +278,9 @@ void Game::GenerateOutputWithDirect2D()
 		D2D1::ColorF(D2D1::ColorF::Black),
 		&brush
 	);
-	std::wstring text(L"試し書き");
+
+	std::wstring text = std::to_wstring(timeLimit);
+
 	pRT->DrawTextW(
 		text.c_str(),
 		text.size(),
@@ -400,81 +329,20 @@ void Game::RemoveActor(Actor* actor)
 	}
 }
 
-/*
-* スプライトを追加。SpriteComponentのコンストラクタ―から実行される。
-*/
-void Game::AddSprite(SpriteComponent* sprite)
+void Game::AddBlock(Block* block)
 {
-	int myDrawOrder = sprite->GetDrawOrder();
-	auto iter = mSprites.begin();
-
-	for (; iter != mSprites.end(); ++iter)
-	{
-		if (myDrawOrder < (*iter)->GetDrawOrder())
-		{
-			break;
-		}
-	}
-
-	mSprites.insert(iter, sprite);
+	mBlocks.push_back(block);
 }
 
-/*
-* スプライトを削除。SpriteComponentのデストラクターから実行される。
-*/
-void Game::RemoveSprite(SpriteComponent* sprite)
+void Game::RemoveBlock(Block* block)
 {
-	auto iter = std::find(mSprites.begin(), mSprites.end(), sprite);
-	mSprites.erase(iter);
+	auto iter = std::find(mBlocks.begin(), mBlocks.end(), block);
+	mBlocks.erase(iter);
 }
 
-SDL_Texture* Game::GetTexture(const std::string& fileName)
+std::vector<Block*>& Game::GetBlocks()
 {
-	SDL_Texture* tex = nullptr;
-	auto iter = mTextures.find(fileName);
-
-	if (iter != mTextures.end())
-	{
-		tex = iter->second;
-	}
-	else
-	{
-		SDL_Surface* surf = IMG_Load(fileName.c_str());
-		if (!surf)
-		{
-			SDL_Log("Failed to load texture file: %s", fileName.c_str());
-			return nullptr;
-		}
-
-		tex = SDL_CreateTextureFromSurface(mRenderer, surf);
-		SDL_FreeSurface(surf);
-		if (!tex)
-		{
-			SDL_Log("Failed to convert surface to texture for %s", fileName.c_str());
-			return nullptr;
-		}
-
-		mTextures.emplace(fileName.c_str(), tex);
-	}
-
-	return tex;
-}
-
-/*
-* SDLを追加する。SDLComponentのコンストラクタ―から実行される。
-*/
-void Game::AddSDL(SDLComponent* sdl)
-{
-	mSDLs.push_back(sdl);
-}
-
-/*
-* SDLを削除する。SDLComponentのデストラクターから実行される。
-*/
-void Game::RemoveSDL(SDLComponent* sdl)
-{
-	auto iter = std::find(mSDLs.begin(), mSDLs.end(), sdl);
-	mSDLs.erase(iter);
+	return mBlocks;
 }
 
 void Game::AddD2D(D2DDrawComponent* d2d)
@@ -503,15 +371,9 @@ void Game::RemoveD2D(D2DDrawComponent* d2d)
 void Game::LoadData()
 {
 	Actor* a = nullptr;
-	/*mRightHand = new Hand(this, 50001, true);
-	mRightHand->SetPosition(Vector2(500.0f, 200.0f));
 
-	mLeftHand = new Hand(this, 50002, false);
-	mLeftHand->SetPosition(Vector2(140.0f, 200.0f));
-
-	mHandManager = new HandManager(this, mRightHand, mLeftHand);*/
-
-	a = new Body(this, 50001);
+	//a = new Body(this, 50001);
+	a = new GimmickGenerator(this);
 
 	a = new Block(this, 100, 20);
 	a->SetPosition(Vector2(0, 0));
@@ -524,11 +386,10 @@ void Game::UnloadData()
 		delete mActors.back();
 	}
 
-	for (auto i : mTextures)
+	while (!mBlocks.empty())
 	{
-		SDL_DestroyTexture(i.second);
+		delete mBlocks.back();
 	}
-	mTextures.clear();
 }
 
 Vector2 Game::GetWindowSize()
@@ -537,6 +398,11 @@ Vector2 Game::GetWindowSize()
 	size.x = window_width;
 	size.y = window_height;
 	return size;
+}
+
+const ID2D1HwndRenderTarget* Game::GetRenderTarget()
+{
+	return pRT;
 }
 
 HRESULT Game::LoadBitmapFromFile(
@@ -565,32 +431,33 @@ HRESULT Game::LoadBitmapFromFile(
 	if (SUCCEEDED(hr))
 	{
 		hr = pDecoder->GetFrame(0, &pSource);
+	}
 
-		if (SUCCEEDED(hr))
-		{
-			hr = pWICFactory->CreateFormatConverter(&pConverter);
-		}
+	if (SUCCEEDED(hr))
+	{
+		SafeRelease(&pConverter);
+		hr = pWICFactory->CreateFormatConverter(&pConverter);
+	}
 
-		if (SUCCEEDED(hr))
-		{
-			hr = pConverter->Initialize(
-				pSource,
-				GUID_WICPixelFormat32bppPBGRA,
-				WICBitmapDitherTypeNone,
-				NULL,
-				0.f,
-				WICBitmapPaletteTypeMedianCut
-			);
-		}
+	if (SUCCEEDED(hr))
+	{
+		hr = pConverter->Initialize(
+			pSource,
+			GUID_WICPixelFormat32bppPBGRA,
+			WICBitmapDitherTypeNone,
+			NULL,
+			0.f,
+			WICBitmapPaletteTypeMedianCut
+		);
+	}
 
-		if (SUCCEEDED(hr))
-		{
-			hr = pRT->CreateBitmapFromWicBitmap(
-				pConverter,
-				NULL,
-				ppBitmap
-			);
-		}
+	if (SUCCEEDED(hr))
+	{
+		hr = pRT->CreateBitmapFromWicBitmap(
+			pConverter,
+			NULL,
+			ppBitmap
+		);
 	}
 
 	SafeRelease(&pDecoder);
@@ -600,4 +467,10 @@ HRESULT Game::LoadBitmapFromFile(
 	SafeRelease(&pScaler);
 
 	return hr;
+}
+
+void Game::ShowErrorMessage(const HRESULT& err)
+{
+	std::string text = std::system_category().message(err);
+	printf("%s\n", text.c_str());
 }

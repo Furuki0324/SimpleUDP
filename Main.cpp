@@ -10,11 +10,11 @@ int main(int argc, char** argv)
 {
 	Game game = Game();
 
-	bool initSDL = game.InitializeSDL();
+	//bool initSDL = game.InitializeSDL();
 
 	bool initD2D = game.InitializeDirect2D();
 
-	if (initSDL && initD2D)
+	if (initD2D)
 	{
 		game.RunLoop();
 	}

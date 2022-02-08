@@ -12,6 +12,12 @@ public:
 
 	void Move(float deltaTime);
 
+	/// <summary>
+	/// 地面にバウンド
+	/// </summary>
+	/// <param name="e">反発係数</param>
+	void Bound(float e);
+
 	//物体に衝撃を加える
 	void AddImpact(const Vector2& impact);
 	//物体の進行方向を指定する

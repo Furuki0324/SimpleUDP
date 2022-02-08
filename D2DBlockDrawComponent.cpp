@@ -1,10 +1,12 @@
 #include "D2DBlockDrawComponent.h"
 #include "Actor.h"
+#include "Block.h"
 
-D2DBlockDrawComponent::D2DBlockDrawComponent(Actor* owner, int width, int height, int drawOrder)
+D2DBlockDrawComponent::D2DBlockDrawComponent(Block* owner, int width, int height, int drawOrder)
 	:D2DDrawComponent(owner)
 	,mWidth(width)
 	,mHeight(height)
+	,m_pOwnerBlock(owner)
 {
 
 }

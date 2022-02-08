@@ -21,49 +21,41 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Block.h" />
-    <ClInclude Include="BlockSDLComponent.h" />
+    <ClInclude Include="GimmickGenerator.h" />
     <ClInclude Include="Body.h" />
     <ClInclude Include="BodyD2DDrawComponent.h" />
-    <ClInclude Include="BodySDLComponent.h" />
     <ClInclude Include="BodyUDPComponent.h" />
+    <ClInclude Include="BoxComponent.h" />
+    <ClInclude Include="CircleComponent.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="D2DBlockDrawComponent.h" />
     <ClInclude Include="D2DDrawComponent.h" />
     <ClInclude Include="D2DSampleBox.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="Hand.h" />
-    <ClInclude Include="HandSpriteComponent.h" />
-    <ClInclude Include="HandUDPComponent.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="PhysicsComponent.h" />
-    <ClInclude Include="SDLComponent.h" />
-    <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="UDPSocket.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Block.cpp" />
-    <ClCompile Include="BlockSDLComponent.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodyD2DDrawComponent.cpp" />
-    <ClCompile Include="BodySDLComponent.cpp" />
     <ClCompile Include="BodyUDPComponent.cpp" />
+    <ClCompile Include="BoxComponent.cpp" />
+    <ClCompile Include="CircleComponent.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="D2DBlockDrawComponent.cpp" />
     <ClCompile Include="D2DDrawComponent.cpp" />
     <ClCompile Include="D2DSampleBox.cpp" />
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Hand.cpp" />
-    <ClCompile Include="HandSpriteComponent.cpp" />
-    <ClCompile Include="HandUDPComponent.cpp" />
+    <ClCompile Include="GimmickGenerator.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="PhysicsComponent.cpp" />
-    <ClCompile Include="SDLComponent.cpp" />
-    <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -119,13 +111,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
