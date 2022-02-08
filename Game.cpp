@@ -13,6 +13,7 @@
 
 const unsigned int window_width = 640;
 const unsigned int window_height = 480;
+const float MIN_FRAME_TIME = 1.0f / 144;
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -44,6 +45,7 @@ Game::Game()
 	,pD2DFactory(nullptr)
 	,mIsRunning(true)
 	,mUpdatingActors(false)
+	,frameTime(0.0f)
 {
 	mWindowSize.x = window_width;
 	mWindowSize.y = window_height;
@@ -97,6 +99,10 @@ bool Game::InitializeSDL()
 
 bool Game::InitializeDirect2D()
 {
+	//フレームレート管理用の変数を取得
+	BOOL query = QueryPerformanceFrequency(&timeFreq);
+	QueryPerformanceCounter(&timeBefore);
+
 	//ここからはDirectX2Dの起動
 	HINSTANCE hInst = GetModuleHandle(nullptr);
 	WNDCLASSEX w = {};
@@ -253,8 +259,23 @@ void Game::ProcessInput()
 void Game::UpdateGame()
 {
 	//指定したフレーム数に到達するまで待機
-	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
-		;
+	//while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16))
+	//	;
+	do
+	{
+		QueryPerformanceCounter(&timeNow);
+		frameTime = (float)(timeNow.QuadPart - timeBefore.QuadPart) / (float)timeFreq.QuadPart;
+	} while (frameTime < MIN_FRAME_TIME);
+
+	//QueryPerformanceCounter(&timeEnd);
+	//frameTime = (float)(timeEnd.QuadPart - timeStart.QuadPart) / (float)timeFreq.QuadPart;
+
+	if (frameTime > 0)
+	{
+		fps = 1.0f / frameTime;
+		printf("FPS:%f\n", fps);
+	}
+	timeBefore = timeNow;
 
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
 	if (deltaTime > 0.05f)

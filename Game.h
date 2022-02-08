@@ -10,9 +10,6 @@
 #include <string>
 #include <tchar.h>
 #include <Windows.h>
-//#include <wincodec.h>		//これをインクルードすると何故か200件のエラーが発生する。c2146
-//#include <wincodecsdk.h>
-//#include <DirectXTex.h>	//こちらでも同種のエラーコード。ただしファイルはdxgi1_2.hとd2d11.h
 #include <dwrite.h>
 #include <d2d1.h>
 
@@ -43,12 +40,6 @@ public:
 
 	Vector2 GetWindowSize();
 
-	//HRESULT LoadFromWICFile(
-	//	const wchar_t* szFile,
-	//	DWORD flags,
-	//	TexMetadata* metadata,
-	//	ScratchImage& image
-	//);
 	HRESULT LoadBitmapFromFile(
 		ID2D1RenderTarget* pRenderTarget,
 		struct IWICImagingFactory* pIWICFactory,
@@ -79,6 +70,11 @@ private:
 
 	Uint32 mTicksCount;
 	bool mIsRunning;
+	float frameTime;
+	float fps;
+	LARGE_INTEGER timeFreq;
+	LARGE_INTEGER timeBefore;
+	LARGE_INTEGER timeNow;
 
 	//SDL関連
 	SDL_Window* mWindow;
