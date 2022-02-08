@@ -13,4 +13,5 @@ public:
 private:
 	class BodyUDPComponent* udpComponent;
 	class BodySDLComponent* sdlComponent;
+	class BodyD2DDrawComponent* d2dComponent;
 };

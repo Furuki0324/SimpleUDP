@@ -5,8 +5,7 @@
 BodySDLComponent::BodySDLComponent(Body* owner, Game* game, int drawOrder)
 	:SDLComponent(owner, drawOrder)
 	,mGame(game)
-	,mBodyPtr(owner)
-	,mBodyUDP(mBodyPtr->GetUDPComponent())
+	,mBodyUDP(owner->GetUDPComponent())
 	,rightHandVector(0,0)
 	,leftHandVector(0,0)
 {

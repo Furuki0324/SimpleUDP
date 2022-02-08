@@ -13,6 +13,27 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ヘッダー ファイル\Direct2DSample">
+      <UniqueIdentifier>{e94d301f-a3b7-4ef0-acfc-97ce3751f6c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Direct2DSample">
+      <UniqueIdentifier>{5ac326b4-635b-4670-9a3e-55770518d8f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\SDL">
+      <UniqueIdentifier>{9db0c5fa-9ef3-4e06-9f0f-e6bcdbd339b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Body">
+      <UniqueIdentifier>{f48f11bd-1882-4739-a361-9ddad2397e18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Hand">
+      <UniqueIdentifier>{023da998-8b5c-4773-a8ea-b2b297e5b8fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Body">
+      <UniqueIdentifier>{6a0a6937-3049-4b05-8ddb-f48add8ec370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Hand">
+      <UniqueIdentifier>{56a47092-26c4-4898-ac34-0e75590e162b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -24,12 +45,6 @@
     <ClInclude Include="SpriteComponent.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Hand.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Yarn.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Math.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -39,40 +54,52 @@
     <ClInclude Include="UDPSocket.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="HandSpriteComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="HandManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="SDLComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="HandUDPComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="YarnSDLComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="BodyUDPComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Body.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="BodySDLComponent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Block.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="PhysicsComponent.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="BlockSDLComponent.h">
+    <ClInclude Include="Collision.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Collision.h">
+    <ClInclude Include="D2DSampleBox.h">
+      <Filter>ヘッダー ファイル\Direct2DSample</Filter>
+    </ClInclude>
+    <ClInclude Include="D2DDrawComponent.h">
+      <Filter>ヘッダー ファイル\Direct2DSample</Filter>
+    </ClInclude>
+    <ClInclude Include="D2DBlockDrawComponent.h">
+      <Filter>ヘッダー ファイル\Direct2DSample</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockSDLComponent.h">
+      <Filter>ヘッダー ファイル\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLComponent.h">
+      <Filter>ヘッダー ファイル\SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="BodySDLComponent.h">
+      <Filter>ヘッダー ファイル\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="BodyUDPComponent.h">
+      <Filter>ヘッダー ファイル\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Body.h">
+      <Filter>ヘッダー ファイル\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="Hand.h">
+      <Filter>ヘッダー ファイル\Hand</Filter>
+    </ClInclude>
+    <ClInclude Include="HandSpriteComponent.h">
+      <Filter>ヘッダー ファイル\Hand</Filter>
+    </ClInclude>
+    <ClInclude Include="HandUDPComponent.h">
+      <Filter>ヘッダー ファイル\Hand</Filter>
+    </ClInclude>
+    <ClInclude Include="BodyD2DDrawComponent.h">
+      <Filter>ヘッダー ファイル\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -98,34 +125,7 @@
     <ClCompile Include="UDPSocket.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Hand.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="HandSpriteComponent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="HandManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Yarn.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="SDLComponent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="HandUDPComponent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="YarnSDLComponent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="BodyUDPComponent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Body.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="BodySDLComponent.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Block.cpp">
@@ -139,6 +139,36 @@
     </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="D2DDrawComponent.cpp">
+      <Filter>ソース ファイル\Direct2DSample</Filter>
+    </ClCompile>
+    <ClCompile Include="D2DSampleBox.cpp">
+      <Filter>ソース ファイル\Direct2DSample</Filter>
+    </ClCompile>
+    <ClCompile Include="D2DBlockDrawComponent.cpp">
+      <Filter>ソース ファイル\Direct2DSample</Filter>
+    </ClCompile>
+    <ClCompile Include="Body.cpp">
+      <Filter>ソース ファイル\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="BodySDLComponent.cpp">
+      <Filter>ソース ファイル\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="BodyUDPComponent.cpp">
+      <Filter>ソース ファイル\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="Hand.cpp">
+      <Filter>ソース ファイル\Hand</Filter>
+    </ClCompile>
+    <ClCompile Include="HandSpriteComponent.cpp">
+      <Filter>ソース ファイル\Hand</Filter>
+    </ClCompile>
+    <ClCompile Include="HandUDPComponent.cpp">
+      <Filter>ソース ファイル\Hand</Filter>
+    </ClCompile>
+    <ClCompile Include="BodyD2DDrawComponent.cpp">
+      <Filter>ソース ファイル\Body</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,6 @@ public:
 	void DrawLine(SDL_Renderer* renderer, std::vector<std::vector<float>> position);
 
 private:
-	class Body* mBodyPtr;
 	std::vector<std::vector<float>> bodyPositions;
 	class Game* mGame;
 	class BodyUDPComponent* mBodyUDP;

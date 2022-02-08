@@ -7,18 +7,8 @@ BodyUDPComponent::BodyUDPComponent(Actor* owner, u_short port, int updateOrder)
 {
 	//MediapipeのPoseで取得する33箇所の座標データを保持するメモリを確保
 	bodyPositions.reserve(33);
-
-	std::vector<float> v;
-	float a = 0;
-	printf("The vector size:%d", bodyPositions.capacity());
-	try
-	{
-		v = bodyPositions.at(1);
-	}
-	catch(const std::out_of_range& e)
-	{
-		printf("\x1b[41mAn error has occured.\x1b[m\n");
-	}
+	std::vector<float> temp(4, 0);
+	bodyPositions = std::vector<std::vector<float>>(33, temp);
 }
 
 void BodyUDPComponent::UDP_Receive()
@@ -111,6 +101,7 @@ Vector2 BodyUDPComponent::GetPointPosition(int index)
 	catch (const std::out_of_range& e)
 	{
 		printf("\x1b[41mOut of bodypositions range.\x1b[m\n");
+		printf("Require:%d, Size:%d\n", index, bodyPositions.size());
 		vec.x = 0;
 		vec.y = 0;
 	}

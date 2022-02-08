@@ -3,29 +3,53 @@
 #include "Hand.h"
 #include "Body.h"
 #include "Block.h"
-#include "HandManager.h"
-#include "Yarn.h"
+#include "D2DSampleBox.h"
 #include "SpriteComponent.h"
+#include "D2DDrawComponent.h"
 #include "SDLComponent.h"
 #include "SDL_image.h"
 #include <iostream>
+#include <wincodec.h>
 
-Game::Game(int windowWidth, int windowHeight)
-	:mWindow(nullptr)
-	,mRenderer(nullptr)
-	,mRightHand(nullptr)
-	,mLeftHand(nullptr)
-	,mHandManager(nullptr)
-	,mIsRunning(true)
-	,mUpdatingActors(false)
-	,mWindowWidth(windowWidth)
-	,mWindowHeight(windowHeight)
+const unsigned int window_width = 640;
+const unsigned int window_height = 480;
+
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	mWindowSize.x = windowWidth;
-	mWindowSize.y = windowHeight;
+	switch (uMsg)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+
+	default:
+		return DefWindowProc(hwnd, uMsg, wParam, lParam);
+	}
+
+	return 0;
 }
 
-bool Game::Initialize()
+template <class T> void Game::SafeRelease(T** ppT)
+{
+	if (*ppT)
+	{
+		(*ppT)->Release();
+		*ppT = nullptr;
+	}
+}
+
+Game::Game()
+	:mWindow(nullptr)
+	,mRenderer(nullptr)
+	,pD2DFactory(nullptr)
+	,mIsRunning(true)
+	,mUpdatingActors(false)
+{
+	mWindowSize.x = window_width;
+	mWindowSize.y = window_height;
+}
+
+bool Game::InitializeSDL()
 {
 	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
@@ -66,9 +90,115 @@ bool Game::Initialize()
 		return false;
 	}
 
-	LoadData();
-
 	mTicksCount = SDL_GetTicks();
+
+	return true;
+}
+
+bool Game::InitializeDirect2D()
+{
+	//ここからはDirectX2Dの起動
+	HINSTANCE hInst = GetModuleHandle(nullptr);
+	WNDCLASSEX w = {};
+	w.cbSize = sizeof(WNDCLASSEX);
+	w.lpfnWndProc = (WNDPROC)MainWndProc;
+	w.lpszClassName = _T("Direct2D");
+	w.hInstance = GetModuleHandle(0);
+	RegisterClassEx(&w);
+
+	RECT wrc = { 0,0,window_width,window_height };
+	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
+
+	hwnd = CreateWindow(
+		w.lpszClassName,
+		_T("Direct2D Test"),
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		wrc.right - wrc.left,
+		wrc.bottom,
+		nullptr,
+		nullptr,
+		w.hInstance,
+		nullptr);
+
+	/*
+	* ID2DFactoryの生成
+	*/
+	HRESULT hr = D2D1CreateFactory(
+		D2D1_FACTORY_TYPE_SINGLE_THREADED,
+		&pD2DFactory
+	);
+	if (FAILED(hr))
+	{
+		printf("D2D1CreateFactory was failed.\n");
+		return false;
+	}
+
+	/*
+	* IDWriteFactoryの生成
+	*/
+	hr = DWriteCreateFactory(
+		DWRITE_FACTORY_TYPE_SHARED,
+		__uuidof(pWriteFactory),
+		reinterpret_cast<IUnknown**>(&pWriteFactory)
+	);
+	if (FAILED(hr))
+	{
+		printf("DWriteCreateFactory was failed.\n");
+		return false;
+	}
+
+	/*
+	* DirectWrite text formatの生成
+	*/
+	hr = pWriteFactory->CreateTextFormat(
+		L"F66筆めいげつ",
+		nullptr,
+		DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		24.0f,
+		L"ja-jp",
+		&pTextFormat
+	);
+	if (FAILED(hr))
+	{
+		printf("CreateTextFormat was failed.\n");
+		return false;
+	}
+
+	pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+	pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+	/*
+	* ID2D1HwndRenderTargetの生成
+	*/
+	hr = pD2DFactory->CreateHwndRenderTarget(
+		D2D1::RenderTargetProperties(),
+		D2D1::HwndRenderTargetProperties(
+			hwnd,
+			D2D1::SizeU(
+				wrc.right - wrc.left,
+				wrc.bottom - wrc.top)
+		),
+		&pRT
+	);
+	if (FAILED(hr))
+	{
+		printf("CreateHwndRenderTarget was failed.\n");
+		return false;
+	}
+
+	/*
+	* IWICImagingFactoryの生成
+	*/
+	hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, reinterpret_cast<void**>(&pWICFactory));
+	if (FAILED(hr))
+	{
+		printf("CoCreateInstance was failed.\n");
+		return false;
+	}
 
 	return true;
 }
@@ -80,16 +210,22 @@ void Game::Shutdown()
 	SDL_DestroyWindow(mWindow);
 	SDL_DestroyRenderer(mRenderer);
 	SDL_Quit();
+
+	SafeRelease(&pRT);
+	SafeRelease(&pD2DFactory);
+
 	std::cout << "Shutdown" << std::endl;
 }
 
 void Game::RunLoop()
 {
+	LoadData();
 	while (mIsRunning)
 	{
 		ProcessInput();
 		UpdateGame();
-		GenerateOutput();
+		//GenerateOutput();
+		GenerateOutputWithDirect2D();
 	}
 }
 
@@ -107,7 +243,8 @@ void Game::ProcessInput()
 	}
 
 	const Uint8* state = SDL_GetKeyboardState(NULL);
-	if (state[SDL_SCANCODE_ESCAPE])
+	const bool escapeState = GetKeyState(VK_ESCAPE) & 0x8000;
+	if (state[SDL_SCANCODE_ESCAPE] || escapeState)
 	{
 		mIsRunning = false;
 	}
@@ -176,6 +313,36 @@ void Game::GenerateOutput()
 	}
 
 	SDL_RenderPresent(mRenderer);
+}
+
+void Game::GenerateOutputWithDirect2D()
+{
+	pRT->BeginDraw();
+
+	pRT->Clear(D2D1::ColorF(D2D1::ColorF::White));
+	for (auto d2d : mD2Ds)
+	{
+		d2d->Draw(pRT);
+	}
+
+	ID2D1SolidColorBrush* brush = nullptr;
+	pRT->CreateSolidColorBrush(
+		D2D1::ColorF(D2D1::ColorF::Black),
+		&brush
+	);
+	std::wstring text(L"試し書き");
+	pRT->DrawTextW(
+		text.c_str(),
+		text.size(),
+		pTextFormat,
+		D2D1::RectF(100.0f, 100.0f, 400.0f, 400.0f),
+		brush
+	);
+	
+	pRT->EndDraw();
+	ShowWindow(hwnd, SW_SHOW);
+
+	SafeRelease(&brush);
 }
 
 void Game::AddActor(Actor* actor)
@@ -289,9 +456,32 @@ void Game::RemoveSDL(SDLComponent* sdl)
 	mSDLs.erase(iter);
 }
 
+void Game::AddD2D(D2DDrawComponent* d2d)
+{
+	int myDrawOrder = d2d->GetDrawOrder();
+	auto iter = mD2Ds.begin();
+
+	for (; iter != mD2Ds.end(); ++iter)
+	{
+		if (myDrawOrder < (*iter)->GetDrawOrder())
+		{
+			break;
+		}
+	}
+
+	mD2Ds.insert(iter, d2d);
+}
+
+void Game::RemoveD2D(D2DDrawComponent* d2d)
+{
+	auto iter = std::find(mD2Ds.begin(), mD2Ds.end(), d2d);
+	mD2Ds.erase(iter);
+}
+
 //起動時に必要なオブジェクトを配置
 void Game::LoadData()
 {
+	Actor* a = nullptr;
 	/*mRightHand = new Hand(this, 50001, true);
 	mRightHand->SetPosition(Vector2(500.0f, 200.0f));
 
@@ -300,10 +490,10 @@ void Game::LoadData()
 
 	mHandManager = new HandManager(this, mRightHand, mLeftHand);*/
 
-	mBody = new Body(this, 50001);
+	a = new Body(this, 50001);
 
-	mBlock = new Block(this, 50, 20);
-	mBlock->SetPosition(Vector2(mWindowSize.x / 2, mWindowSize.y / 2));
+	a = new Block(this, 100, 20);
+	a->SetPosition(Vector2(0, 0));
 }
 
 void Game::UnloadData()
@@ -323,7 +513,70 @@ void Game::UnloadData()
 Vector2 Game::GetWindowSize()
 {
 	Vector2 size;
-	size.x = mWindowWidth;
-	size.y = mWindowHeight;
+	size.x = window_width;
+	size.y = window_height;
 	return size;
+}
+
+HRESULT Game::LoadBitmapFromFile(
+	ID2D1RenderTarget* pRenderTarget,
+	IWICImagingFactory* pIWICFactory,
+	PCWSTR uri,
+	UINT destinationWidth,
+	UINT destinationHeight,
+	ID2D1Bitmap** ppBitmap
+)
+{
+	IWICBitmapDecoder* pDecoder = NULL;
+	IWICBitmapFrameDecode* pSource = NULL;
+	IWICStream* pStream = NULL;
+	IWICFormatConverter* pConverter = NULL;
+	IWICBitmapScaler* pScaler = NULL;
+
+	HRESULT hr = pWICFactory->CreateDecoderFromFilename(
+		uri,
+		NULL,
+		GENERIC_READ,
+		WICDecodeMetadataCacheOnLoad,
+		&pDecoder
+	);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pDecoder->GetFrame(0, &pSource);
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pWICFactory->CreateFormatConverter(&pConverter);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pConverter->Initialize(
+				pSource,
+				GUID_WICPixelFormat32bppPBGRA,
+				WICBitmapDitherTypeNone,
+				NULL,
+				0.f,
+				WICBitmapPaletteTypeMedianCut
+			);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pRT->CreateBitmapFromWicBitmap(
+				pConverter,
+				NULL,
+				ppBitmap
+			);
+		}
+	}
+
+	SafeRelease(&pDecoder);
+	SafeRelease(&pSource);
+	SafeRelease(&pStream);
+	SafeRelease(&pConverter);
+	SafeRelease(&pScaler);
+
+	return hr;
 }

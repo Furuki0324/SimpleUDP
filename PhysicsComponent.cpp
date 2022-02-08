@@ -15,7 +15,7 @@ void PhysicsComponent::Update(float deltaTime)
 	Move(deltaTime);
 }
 
-void PhysicsComponent::SetGravityAcceleration(float acceleration)
+void PhysicsComponent::SetGravityAcceleration(const float& acceleration)
 {
 	mGravityAcceleration = acceleration;
 }

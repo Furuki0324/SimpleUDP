@@ -23,35 +23,40 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="BlockSDLComponent.h" />
     <ClInclude Include="Body.h" />
+    <ClInclude Include="BodyD2DDrawComponent.h" />
     <ClInclude Include="BodySDLComponent.h" />
     <ClInclude Include="BodyUDPComponent.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="D2DBlockDrawComponent.h" />
+    <ClInclude Include="D2DDrawComponent.h" />
+    <ClInclude Include="D2DSampleBox.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hand.h" />
-    <ClInclude Include="HandManager.h" />
     <ClInclude Include="HandSpriteComponent.h" />
     <ClInclude Include="HandUDPComponent.h" />
+    <ClInclude Include="HUD.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="SDLComponent.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="UDPSocket.h" />
-    <ClInclude Include="Yarn.h" />
-    <ClInclude Include="YarnSDLComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="BlockSDLComponent.cpp" />
     <ClCompile Include="Body.cpp" />
+    <ClCompile Include="BodyD2DDrawComponent.cpp" />
     <ClCompile Include="BodySDLComponent.cpp" />
     <ClCompile Include="BodyUDPComponent.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="D2DBlockDrawComponent.cpp" />
+    <ClCompile Include="D2DDrawComponent.cpp" />
+    <ClCompile Include="D2DSampleBox.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hand.cpp" />
-    <ClCompile Include="HandManager.cpp" />
     <ClCompile Include="HandSpriteComponent.cpp" />
     <ClCompile Include="HandUDPComponent.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -60,15 +65,13 @@
     <ClCompile Include="SDLComponent.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
-    <ClCompile Include="Yarn.cpp" />
-    <ClCompile Include="YarnSDLComponent.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{9885b8c5-e498-4615-9284-de2b66e009d9}</ProjectGuid>
     <RootNamespace>SimpleUDP</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -133,16 +136,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\SDL2_image-2.0.3\include;C:\SDL2-2.0.18\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\SDL2_image-2.0.3\include;C:\SDL2-2.0.18\include;$(DXTEX_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\SDL2_image-2.0.3\lib\x86;C:\SDL2-2.0.18\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;d2d1.lib;Dwrite.lib;WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SDL2_image-2.0.3\lib\x86;C:\SDL2-2.0.18\lib\x86;$(DXTEX_DIR)\Bin\Desktop_2019_Win10\Win32\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "C:\SDL2-2.0.18\lib\x86\*.dll" "$(OutDir)" /i /s /y</Command>
+      <Command>xcopy "C:\SDL2-2.0.18\lib\x86\*.dll" "$(OutDir)" /S /I /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -167,10 +170,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\SDL2_image-2.0.3\include;C:\SDL2-2.0.18\include;$(DXTEX_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\SDL2_image-2.0.3\lib\x86;C:\SDL2-2.0.18\lib\x86;$(DXTEX_DIR)\Bin\Desktop_2019_Win10\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ws2_32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;d2d1.lib;Dwrite.lib;WindowsCodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

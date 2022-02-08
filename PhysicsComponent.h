@@ -16,7 +16,7 @@ public:
 	void AddImpact(const Vector2& impact);
 	//•¨‘Ì‚Ìis•ûŒü‚ğw’è‚·‚é
 	void SetDirection(const Vector2& direction);
-	void SetGravityAcceleration(float acceleration);
+	void SetGravityAcceleration(const float& acceleration);
 	float GetGravityAcceleration() const { return mGravityAcceleration; }
 	void SetGravityState(bool state);
 	bool GetGravityState() const { return mIsGravityActive; }

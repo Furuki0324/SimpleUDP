@@ -10,7 +10,14 @@ public:
 
 	void UpdateActor(float deltaTime) override;
 
+	const std::vector<Vector2>& GetBlockCorners();
+
 private:
-	class BlockSDLComponent* sdlComponent;
 	class PhysicsComponent* physicsComponent;
+
+	float mWidth, mHeight;
+	//‘±ŠÔ
+	float lifeTime;
+	//ƒvƒŒƒCƒ„[‚ÌŒ‚ÉÚG‚µ‚½‚©
+	bool isHit;
 };
