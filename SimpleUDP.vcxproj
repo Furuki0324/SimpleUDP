@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="Blade.h" />
+    <ClInclude Include="BladeD2DDrawComponent.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GimmickGenerator.h" />
     <ClInclude Include="Body.h" />
@@ -43,6 +44,7 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="Blade.cpp" />
+    <ClCompile Include="BladeD2DDrawComponent.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodyD2DDrawComponent.cpp" />

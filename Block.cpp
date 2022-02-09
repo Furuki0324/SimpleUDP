@@ -64,6 +64,7 @@ void Block::SetHit(bool hit)
 	if (!isHit && hit)		//‚±‚Ìˆ—‚Íˆê“x‚Ì‚İÀs‚·‚é
 	{
 		mGame->AddScore(100);
+		mGame->PlayAudio(L"Media\\–‚‰¤° í“¬16.wav", 0);
 		isHit = hit;
 	}
 }

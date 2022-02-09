@@ -109,7 +109,7 @@ Vector2 BodyUDPComponent::GetPointPosition(int index)
 	return vec;
 }
 
-std::vector<std::vector<float>> BodyUDPComponent::GetAllPosition()
+const std::vector<std::vector<float>>& BodyUDPComponent::GetAllPosition()
 {
 	return bodyPositions;
 }

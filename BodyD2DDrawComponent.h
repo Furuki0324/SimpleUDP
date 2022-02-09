@@ -12,7 +12,4 @@ public:
 private:
 	std::vector<std::vector<float>> bodyPositions;
 	class BodyUDPComponent* mBodyUDP;
-
-	Vector2 rightHandPosition, leftHandPosition;
-	Vector2 rightHandVector, leftHandVector;
 };

@@ -14,18 +14,22 @@ GimmickGenerator::GimmickGenerator(Game* game)
 
 void GimmickGenerator::UpdateActor(float deltaTime)
 {
-	passedTime += deltaTime;
-	if (passedTime >= 5.0f * generateCount)
+	if (mGame->GetScene() == Game::Scene::MainGame
+		)
 	{
-		if (generateCount % 4 == 0)
+		passedTime += deltaTime;
+		if (passedTime >= 2.0f * generateCount)
 		{
-			GenerateBlade();
+			if (generateCount % 4 == 0)
+			{
+				GenerateBlade();
+			}
+			else
+			{
+				GenerateBlock();
+			}
+			++generateCount;
 		}
-		else
-		{
-			GenerateBlock();
-		}
-		++generateCount;
 	}
 }
 
@@ -59,5 +63,8 @@ void GimmickGenerator::GenerateBlock()
 
 void GimmickGenerator::GenerateBlade()
 {
-	mGame->PlayAudio(_T("Media\\–‚‰¤° í“¬16.wav"));
+	Blade* blade = new HorizontalBlade(mGame);
+	blade->SetPosition(Vector2(-1000, mGame->GetRenderTarget()->GetSize().height * 0.9f));
+	blade->GetPhysicsComponent()->SetDirection(Vector2(1000.0f, 0.0f));
+	mGame->PlayAudio(_T("Media\\–‚‰¤° Œø‰Ê‰¹ ƒƒ“ƒ|ƒCƒ“ƒg11.wav"));
 }

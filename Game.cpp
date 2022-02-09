@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Body.h"
 #include "Block.h"
+#include "Blade.h"
 #include "GimmickGenerator.h"
 #include "D2DSampleBox.h"
 #include "D2DDrawComponent.h"
@@ -20,7 +21,8 @@
 
 const unsigned int window_width = 960;
 const unsigned int window_height = 720;
-const float MIN_FRAME_TIME = 1.0f / 144;
+const float MIN_FRAME_TIME = 1.0f / 60;		//60FPS
+const float TIME_LIMIT = 65.0f;				//制限時間
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -115,17 +117,20 @@ Game::Game()
 	:pD2DFactory(nullptr)
 	,mIsRunning(true)
 	,mUpdatingActors(false)
+	,currentScene(Title)
+	,score(0)
 	,frameTime(0.0f)
-	,timeLimit(10.0f)
+	,timeLimit(TIME_LIMIT)
 {
 }
 
 void Game::Shutdown()
 {
+	UnloadData();
+
 	SafeRelease(&pD2DFactory);
 	SafeRelease(&pRT);
 	SafeRelease(&pWriteFactory);
-	SafeRelease(&pTextFormat);
 
 	std::cout << "Shutdown" << std::endl;
 }
@@ -200,29 +205,6 @@ bool Game::InitializeDirect2D()
 	}
 
 	/*
-	* DirectWrite text formatの生成
-	*/
-	hr = pWriteFactory->CreateTextFormat(
-		L"F66筆めいげつ",
-		nullptr,
-		DWRITE_FONT_WEIGHT_NORMAL,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		24.0f,
-		L"ja-jp",
-		&pTextFormat
-	);
-	if (FAILED(hr))
-	{
-		printf("CreateTextFormat was failed.\n");
-		ShowErrorMessage(hr);
-		return false;
-	}
-
-	pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
-	pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-	/*
 	* ID2D1HwndRenderTargetの生成
 	*/
 	hr = pD2DFactory->CreateHwndRenderTarget(
@@ -285,7 +267,7 @@ bool Game::InitializeDirect2D()
 	return true;
 }
 
-void Game::PlayAudio(LPCTSTR wavFilePath)
+void Game::PlayAudio(LPCTSTR wavFilePath, UINT32 loop, bool isBGM)
 {
 	HRESULT hr = S_OK;
 
@@ -332,6 +314,7 @@ void Game::PlayAudio(LPCTSTR wavFilePath)
 	buffer.AudioBytes = dwChunkSize;
 	buffer.pAudioData = pDataBuffer;
 	buffer.Flags = XAUDIO2_END_OF_STREAM;
+	buffer.LoopCount = loop;
 
 	IXAudio2SourceVoice* pSourceVoice;
 	hr = pXAudio2->CreateSourceVoice(&pSourceVoice, (WAVEFORMATEX*)&wfx);
@@ -354,11 +337,17 @@ void Game::PlayAudio(LPCTSTR wavFilePath)
 		printf("Start was failed.\n");
 		ShowErrorMessage(hr);
 	}
+
+	//使うかわからないけれど、BGMのポインターは確保しておく
+	if (isBGM)
+	{
+		mBGMSource = pSourceVoice;
+	}
 }
 
 void Game::RunLoop()
 {
-	PlayAudio(_T("Media\\魔王魂 フィールド01.wav"));
+	PlayAudio(_T("Media\\魔王魂 フィールド01.wav"), XAUDIO2_LOOP_INFINITE, true);
 	LoadData();
 	while (mIsRunning)
 	{
@@ -366,6 +355,35 @@ void Game::RunLoop()
 		UpdateGame();
 		GenerateOutputWithDirect2D();
 	}
+}
+
+void Game::SetScene(Scene newScene)
+{
+	currentScene = newScene;
+	switch (currentScene)
+	{
+	case Title:
+		break;
+
+	case MainGame:
+		score = 0;
+		timeLimit = TIME_LIMIT;
+		break;
+		
+	case Result:
+		PlayAudio(_T("Media\\魔王魂 効果音 ワンポイント12.wav"));
+		break;
+	}
+}
+
+Game::Scene Game::GetScene() const
+{
+	return currentScene;
+}
+
+int Game::GetTimeLimit()
+{
+	return timeLimit;
 }
 
 void Game::ProcessInput()
@@ -403,7 +421,15 @@ void Game::UpdateGame()
 		deltaTime = 0.05f;
 	}
 	timeBefore = timeNow;
-	timeLimit += deltaTime;
+
+	if (currentScene == MainGame)
+	{
+		timeLimit -= deltaTime;
+		if (timeLimit < 0.0f)
+		{
+			SetScene(Result);
+		}
+	}
 
 	//全てのアクターを更新
 	mUpdatingActors = true;
@@ -450,22 +476,6 @@ void Game::GenerateOutputWithDirect2D()
 		d2d->Draw(pRT);
 	}
 
-	ID2D1SolidColorBrush* brush = nullptr;
-	pRT->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Black),
-		&brush
-	);
-
-	std::wstring text = std::to_wstring(timeLimit);
-
-	pRT->DrawTextW(
-		text.c_str(),
-		text.size(),
-		pTextFormat,
-		D2D1::RectF(100.0f, 100.0f, 400.0f, 400.0f),
-		brush
-	);
-	
 	for (auto ui : mUIs)
 	{
 		ui->Draw(pRT, pWriteFactory);
@@ -473,8 +483,6 @@ void Game::GenerateOutputWithDirect2D()
 
 	pRT->EndDraw();
 	ShowWindow(hwnd, SW_SHOW);
-
-	SafeRelease(&brush);
 }
 
 void Game::AddScore(const int value)
@@ -539,6 +547,22 @@ std::vector<Block*>& Game::GetBlocks()
 	return mBlocks;
 }
 
+void Game::AddBlade(Blade* blade)
+{
+	mBlades.push_back(blade);
+}
+
+void Game::RemoveBlade(Blade* blade)
+{
+	auto iter = std::find(mBlades.begin(), mBlades.end(), blade);
+	mBlades.erase(iter);
+}
+
+std::vector<Blade*>& Game::GetBlades()
+{
+	return mBlades;
+}
+
 void Game::AddD2D(D2DDrawComponent* d2d)
 {
 	int myDrawOrder = d2d->GetDrawOrder();
@@ -580,9 +604,6 @@ void Game::LoadData()
 
 	a = new Body(this, 50001);
 	a = new GimmickGenerator(this);
-
-	a = new Block(this, 100, 20);
-	a->SetPosition(Vector2(0, 0));
 
 	ui = new HUD(this);
 }
