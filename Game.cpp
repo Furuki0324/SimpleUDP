@@ -5,8 +5,18 @@
 #include "GimmickGenerator.h"
 #include "D2DSampleBox.h"
 #include "D2DDrawComponent.h"
+#include "UIScreen.h"
+#include "HUD.h"
 #include <iostream>
 #include <wincodec.h>
+#include <xaudio2.h>
+
+#define fourccRIFF 'FFIR'
+#define fourccDATA 'atad'
+#define fourccFMT ' tmf'
+#define fourccWAVE 'EVAW'
+#define fourccXWMA 'AMWX'
+#define fourccDPDS 'sdpd'
 
 const unsigned int window_width = 960;
 const unsigned int window_height = 720;
@@ -36,6 +46,71 @@ template <class T> void Game::SafeRelease(T** ppT)
 	}
 }
 
+HRESULT Game::FindChunk(HANDLE hFile, DWORD fourcc, DWORD& dwChunkSize, DWORD& dwChunkDataPosition)
+{
+	HRESULT hr = S_OK;
+	if (INVALID_SET_FILE_POINTER == SetFilePointer(hFile, 0, NULL, FILE_BEGIN))
+		return HRESULT_FROM_WIN32(GetLastError());
+
+	DWORD dwChunkType;
+	DWORD dwChunkDataSize;
+	DWORD dwRIFFDataSize = 0;
+	DWORD dwFileType;
+	DWORD bytesRead = 0;
+	DWORD dwOffset = 0;
+
+	while (hr == S_OK)
+	{
+		DWORD dwRead;
+		if (0 == ReadFile(hFile, &dwChunkType, sizeof(DWORD), &dwRead, NULL))
+			hr = HRESULT_FROM_WIN32(GetLastError());
+
+		if (0 == ReadFile(hFile, &dwChunkDataSize, sizeof(DWORD), &dwRead, NULL))
+			hr = HRESULT_FROM_WIN32(GetLastError());
+
+		switch (dwChunkType)
+		{
+		case fourccRIFF:
+			dwRIFFDataSize = dwChunkDataSize;
+			dwChunkDataSize = 4;
+			if (0 == ReadFile(hFile, &dwFileType, sizeof(DWORD), &dwRead, NULL))
+				hr = HRESULT_FROM_WIN32(GetLastError());
+			break;
+
+		default:
+			if (INVALID_SET_FILE_POINTER == SetFilePointer(hFile, dwChunkDataSize, NULL, FILE_CURRENT))
+				return HRESULT_FROM_WIN32(GetLastError());
+		}
+
+		dwOffset += sizeof(DWORD) * 2;
+
+		if (dwChunkType == fourcc)
+		{
+			dwChunkSize = dwChunkDataSize;
+			dwChunkDataPosition = dwOffset;
+			return S_OK;
+		}
+
+		dwOffset += dwChunkDataSize;
+
+		if (bytesRead >= dwRIFFDataSize) return S_FALSE;
+
+	}
+
+	return S_OK;
+}
+
+HRESULT Game::ReadChunkData(HANDLE hFile, void* buffer, DWORD buffersize, DWORD bufferoffset)
+{
+	HRESULT hr = S_OK;
+	if (INVALID_SET_FILE_POINTER == SetFilePointer(hFile, bufferoffset, NULL, FILE_BEGIN))
+		return HRESULT_FROM_WIN32(GetLastError());
+	DWORD dwRead;
+	if (0 == ReadFile(hFile, buffer, buffersize, &dwRead, NULL))
+		hr = HRESULT_FROM_WIN32(GetLastError());
+	return hr;
+}
+
 Game::Game()
 	:pD2DFactory(nullptr)
 	,mIsRunning(true)
@@ -62,7 +137,14 @@ bool Game::InitializeDirect2D()
 	QueryPerformanceCounter(&timeBefore);
 
 	//ここからはDirectX2Dの起動
-	HRESULT hr = CoInitialize(NULL);
+	//HRESULT hr = CoInitialize(NULL);
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	if (FAILED(hr))
+	{
+		printf("CoInitializeEx was failed.\n");
+		ShowErrorMessage(hr);
+		return false;
+	}
 
 	HINSTANCE hInst = GetModuleHandle(nullptr);
 	WNDCLASSEX w = {};
@@ -176,15 +258,107 @@ bool Game::InitializeDirect2D()
 		return false;
 	}
 
+	/*
+	* IXAudio2の生成
+	*/
+	hr = XAudio2Create(&pXAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
+	if (FAILED(hr))
+	{
+		printf("XAudio2Create was failed.\n");
+		ShowErrorMessage(hr);
+		return false;
+	}
+
+	/*
+	* IXAudio2MasteringVoiceの生成
+	*/
+	hr = pXAudio2->CreateMasteringVoice(&pMasterVoice);
+	if (FAILED(hr))
+	{
+		printf("CreateMasteringVoice was failed.");
+		ShowErrorMessage(hr);
+		return false;
+	}
+
 	CoUninitialize();
 
 	return true;
 }
 
+void Game::PlayAudio(LPCTSTR wavFilePath)
+{
+	HRESULT hr = S_OK;
 
+	WAVEFORMATEXTENSIBLE wfx = { 0 };
+	XAUDIO2_BUFFER buffer = { 0 };
+
+	HANDLE hFile = CreateFile(
+		wavFilePath,
+		GENERIC_READ,
+		FILE_SHARE_READ,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL
+	);
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		hr = HRESULT_FROM_WIN32(GetLastError());
+		ShowErrorMessage(hr);
+	}
+	if (INVALID_SET_FILE_POINTER == SetFilePointer(hFile, 0, NULL, FILE_BEGIN))
+	{
+		hr = HRESULT_FROM_WIN32(GetLastError());
+		ShowErrorMessage(hr);
+	}
+
+	DWORD dwChunkSize;
+	DWORD dwChunkPosition;
+	FindChunk(hFile, fourccRIFF, dwChunkSize, dwChunkPosition);
+	DWORD filetype;
+	ReadChunkData(hFile, &filetype, sizeof(DWORD), dwChunkPosition);
+	if (filetype != fourccWAVE)
+	{
+		printf("INVALID FILE TYPE\n");
+	}
+
+	FindChunk(hFile, fourccFMT, dwChunkSize, dwChunkPosition);
+	ReadChunkData(hFile, &wfx, dwChunkSize, dwChunkPosition);
+
+	FindChunk(hFile, fourccDATA, dwChunkSize, dwChunkPosition);
+	BYTE* pDataBuffer = new BYTE[dwChunkSize];
+	ReadChunkData(hFile, pDataBuffer, dwChunkSize, dwChunkPosition);
+
+	buffer.AudioBytes = dwChunkSize;
+	buffer.pAudioData = pDataBuffer;
+	buffer.Flags = XAUDIO2_END_OF_STREAM;
+
+	IXAudio2SourceVoice* pSourceVoice;
+	hr = pXAudio2->CreateSourceVoice(&pSourceVoice, (WAVEFORMATEX*)&wfx);
+	if (FAILED(hr))
+	{
+		printf("CreateSourceVoice was failed.\n");
+		ShowErrorMessage(hr);
+	}
+
+	hr = pSourceVoice->SubmitSourceBuffer(&buffer);
+	if (FAILED(hr))
+	{
+		printf("SubmitSourceBuffer was failed.\n");
+		ShowErrorMessage(hr);
+	}
+
+	hr = pSourceVoice->Start(0);
+	if (FAILED(hr))
+	{
+		printf("Start was failed.\n");
+		ShowErrorMessage(hr);
+	}
+}
 
 void Game::RunLoop()
 {
+	PlayAudio(_T("Media\\魔王魂 フィールド01.wav"));
 	LoadData();
 	while (mIsRunning)
 	{
@@ -216,13 +390,12 @@ void Game::ProcessInput()
 
 void Game::UpdateGame()
 {
-	//指定したフレーム数に到達するまで待機
+	//指定したFPSを維持する
 	do
 	{
 		QueryPerformanceCounter(&timeNow);
 		frameTime = (float)(timeNow.QuadPart - timeBefore.QuadPart) / (float)timeFreq.QuadPart;
 	} while (frameTime < MIN_FRAME_TIME);
-
 
 	float deltaTime = frameTime;
 	if (deltaTime > 0.05f)
@@ -239,7 +412,6 @@ void Game::UpdateGame()
 		actor->Update(deltaTime);
 	}
 	mUpdatingActors = false;
-
 
 	//保留中のアクターをmActorsに移動。次の更新タイミングで更新されるようにする
 	for (auto pending : mPendingActors)
@@ -260,6 +432,11 @@ void Game::UpdateGame()
 	for (auto actor : deadActors)
 	{
 		delete actor;
+	}
+
+	for (auto ui : mUIs)
+	{
+		ui->Update(deltaTime);
 	}
 }
 
@@ -289,10 +466,27 @@ void Game::GenerateOutputWithDirect2D()
 		brush
 	);
 	
+	for (auto ui : mUIs)
+	{
+		ui->Draw(pRT, pWriteFactory);
+	}
+
 	pRT->EndDraw();
 	ShowWindow(hwnd, SW_SHOW);
 
 	SafeRelease(&brush);
+}
+
+void Game::AddScore(const int value)
+{
+	score += value;
+
+	if (score < 0) { score = 0; }
+}
+
+const int Game::GetScore()
+{
+	return score;
 }
 
 void Game::AddActor(Actor* actor)
@@ -367,16 +561,30 @@ void Game::RemoveD2D(D2DDrawComponent* d2d)
 	mD2Ds.erase(iter);
 }
 
+void Game::AddUI(UIScreen* ui)
+{
+	mUIs.push_back(ui);
+}
+
+void Game::RemoveUI(UIScreen* ui)
+{
+	auto iter = std::find(mUIs.begin(), mUIs.end(), ui);
+	mUIs.erase(iter);
+}
+
 //起動時に必要なオブジェクトを配置
 void Game::LoadData()
 {
 	Actor* a = nullptr;
+	UIScreen* ui = nullptr;
 
-	//a = new Body(this, 50001);
+	a = new Body(this, 50001);
 	a = new GimmickGenerator(this);
 
 	a = new Block(this, 100, 20);
 	a->SetPosition(Vector2(0, 0));
+
+	ui = new HUD(this);
 }
 
 void Game::UnloadData()
@@ -390,14 +598,11 @@ void Game::UnloadData()
 	{
 		delete mBlocks.back();
 	}
-}
 
-Vector2 Game::GetWindowSize()
-{
-	Vector2 size;
-	size.x = window_width;
-	size.y = window_height;
-	return size;
+	while (!mUIs.empty())
+	{
+		delete mUIs.back();
+	}
 }
 
 const ID2D1HwndRenderTarget* Game::GetRenderTarget()

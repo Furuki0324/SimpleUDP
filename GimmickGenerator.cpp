@@ -1,6 +1,7 @@
 #include "GimmickGenerator.h"
 #include "Game.h"
 #include "Block.h"
+#include "Blade.h"
 #include "PhysicsComponent.h"
 
 GimmickGenerator::GimmickGenerator(Game* game)
@@ -14,7 +15,7 @@ GimmickGenerator::GimmickGenerator(Game* game)
 void GimmickGenerator::UpdateActor(float deltaTime)
 {
 	passedTime += deltaTime;
-	if (passedTime >= 0.5f * generateCount)
+	if (passedTime >= 5.0f * generateCount)
 	{
 		if (generateCount % 4 == 0)
 		{
@@ -53,11 +54,10 @@ void GimmickGenerator::GenerateBlock()
 			block->GetPhysicsComponent()->AddImpact(Vector2(300, -300));
 		}
 	}
-
-	printf("Generate block.\n");
+	mGame->PlayAudio(_T("Media\\–‚‰¤° Œø‰Ê‰¹ •¨‰¹16.wav"));
 }
 
 void GimmickGenerator::GenerateBlade()
 {
-	printf("Generate blade.\n");
+	mGame->PlayAudio(_T("Media\\–‚‰¤° í“¬16.wav"));
 }

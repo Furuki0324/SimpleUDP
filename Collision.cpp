@@ -24,6 +24,13 @@ bool Intersect(const Circle& a, const Circle& b)
 //まだ回転した物体の対応は出来ない。
 bool Intersect(const Circle& a, const Box& b)
 {
+	if (b.mMax.x == 0 && b.mMax.y == 0
+		&& b.mMin.x == 0 && b.mMin.y == 0)
+	{
+		printf("\x1b[41mDefault position\x1b[m\n");
+		return false;
+	}
+
 	bool collided = false;
 	//四角形の辺をそれぞれ線分として外積の計算式から最短距離を導き出す
 	Vector2 boxStart;
@@ -53,6 +60,11 @@ bool Intersect(const Circle& a, const Box& b)
 			boxEnd = b.mMin;
 			break;
 		}
+		printf("%d\n", i);
+		printf("BoxStart.x:%f BoxStart.y:%f\n", boxStart.x, boxStart.y);
+		printf("BoxEnd.x:%f BoxEnd.y:%f\n", boxEnd.x, boxEnd.y);
+		printf("CircleCenter.x:%f CircleCenter.y:%f CircleRadius:%f\n", a.mCenter.x, a.mCenter.y, a.mRadius);
+
 		Vector2 startToCenter = a.mCenter - boxStart;
 		Vector2 endToCenter = a.mCenter - boxEnd;
 		Vector2 startToEnd = boxEnd - boxStart;
@@ -74,6 +86,7 @@ bool Intersect(const Circle& a, const Box& b)
 
 		if (dotStartAndCenter * dotEndAndCenter <= 0.0f)
 		{
+			printf("\x1b[41mDot\x1b[m\n");
 			collided = true;
 			break;		//一回でも接触していることが分かれば十分なためループ脱出
 		}
@@ -82,10 +95,10 @@ bool Intersect(const Circle& a, const Box& b)
 		if (startToCenter.Length() < a.mRadius
 			|| endToCenter.Length() < a.mRadius)
 		{
+			printf("Final\n");
 			collided = true;
 			break;
 		}
 	}
-
 	return collided;
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="Blade.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="GimmickGenerator.h" />
     <ClInclude Include="Body.h" />
@@ -37,9 +38,11 @@
     <ClInclude Include="Math.h" />
     <ClInclude Include="PhysicsComponent.h" />
     <ClInclude Include="UDPSocket.h" />
+    <ClInclude Include="UIScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
+    <ClCompile Include="Blade.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="BodyD2DDrawComponent.cpp" />
@@ -53,10 +56,12 @@
     <ClCompile Include="D2DSampleBox.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GimmickGenerator.cpp" />
+    <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="PhysicsComponent.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
+    <ClCompile Include="UIScreen.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

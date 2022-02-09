@@ -36,18 +36,9 @@ void Block::UpdateActor(float deltaTime)
 	Vector2 currentPos = GetPosition();
 	D2D1_SIZE_F windowSize = mGame->GetRenderTarget()->GetSize();
 
-	if(currentPos.y > windowSize.height)
+	if (currentPos.y > windowSize.height + 50.0f)
 	{
-		physicsComponent->Bound(0.5f);
-	}
-	
-	if (currentPos.x < 0)
-	{
-		physicsComponent->AddImpact(Vector2(300, 0));
-	}
-	else if (currentPos.x > windowSize.width)
-	{
-		physicsComponent->AddImpact(Vector2(-300, 0));
+		SetState(EDead);
 	}
 
 	boxComponent->UpdateWorldBoxTransform();
@@ -70,5 +61,9 @@ bool Block::GetHit()
 
 void Block::SetHit(bool hit)
 {
-	isHit = hit;
+	if (!isHit && hit)		//‚±‚Ìˆ—‚Íˆê“x‚Ì‚ÝŽÀs‚·‚é
+	{
+		mGame->AddScore(100);
+		isHit = hit;
+	}
 }

@@ -14,13 +14,25 @@ D2DBlockDrawComponent::D2DBlockDrawComponent(Block* owner, int width, int height
 void D2DBlockDrawComponent::Draw(ID2D1HwndRenderTarget* renderer)
 {
 	Vector2 position = mOwner->GetPosition();
+	bool isHit = m_pOwnerBlock->GetHit();
 
-	ID2D1SolidColorBrush* pRedBrush = NULL;
+	ID2D1SolidColorBrush* brush = nullptr;
 
-	renderer->CreateSolidColorBrush(
-		D2D1::ColorF(D2D1::ColorF::Red),
-		&pRedBrush
-	);
+	if (isHit)
+	{
+		renderer->CreateSolidColorBrush(
+			D2D1::ColorF(D2D1::ColorF::Blue),
+			&brush
+		);
+	}
+	else
+	{
+		renderer->CreateSolidColorBrush(
+			D2D1::ColorF(D2D1::ColorF::Red),
+			&brush
+		);
+	}
+
 
 	D2D1_SIZE_F rtSize = renderer->GetSize();
 
@@ -31,6 +43,6 @@ void D2DBlockDrawComponent::Draw(ID2D1HwndRenderTarget* renderer)
 			position.x + mWidth / 2,
 			position.y + mHeight / 2
 		),
-		pRedBrush
+		brush
 	);
 }

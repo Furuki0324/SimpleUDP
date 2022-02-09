@@ -1,7 +1,7 @@
 #pragma once
 #pragma comment(lib, "WindowsCodecs.lib")
 #pragma comment(lib, "DirectXTex.lib")
-#pragma comment(lib, "Dwrite.lib")
+#pragma comment(lib, "Xaudio2.lib")
 
 #include "Math.h"
 #include <vector>
@@ -32,8 +32,14 @@ public:
 	void AddD2D(class D2DDrawComponent* d2d);
 	void RemoveD2D(class D2DDrawComponent* d2d);
 
+	void AddUI(class UIScreen* ui);
+	void RemoveUI(class UIScreen* ui);
+
+	void AddScore(const int score);
+	const int GetScore();
+
 	const ID2D1HwndRenderTarget* GetRenderTarget();
-	Vector2 GetWindowSize();
+	void PlayAudio(LPCTSTR wavFilePath);
 
 	HRESULT LoadBitmapFromFile(
 		ID2D1RenderTarget* pRenderTarget,
@@ -44,6 +50,22 @@ public:
 		ID2D1Bitmap** ppBitmap
 	);
 
+	HRESULT FindChunk(
+		HANDLE hFile,
+		DWORD fourcc,
+		DWORD& dwChunkSize,
+		DWORD& d2ChunkDataPosition
+	);
+
+	HRESULT ReadChunkData(
+		HANDLE hFile,
+		void* buffer,
+		DWORD bufferSize,
+		DWORD bufferoffset
+	);
+
+	void ShowErrorMessage(const HRESULT& err);
+
 private:
 	void ProcessInput();
 	void UpdateGame();
@@ -52,16 +74,17 @@ private:
 	void LoadData();
 	void UnloadData();
 
-	void ShowErrorMessage(const HRESULT& err);
+
 
 private:
 	std::vector<class Actor*> mActors;
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class D2DDrawComponent*> mD2Ds;
 	std::vector<class Block*> mBlocks;
+	std::vector<class UIScreen*> mUIs;
 	bool mUpdatingActors;
 
-
+	int score;
 	bool mIsRunning;
 	float frameTime;
 	float timeLimit;
@@ -70,8 +93,6 @@ private:
 	LARGE_INTEGER timeNow;
 	MSG msg;
 
-	Vector2 mWindowSize;
-
 	//Direct2DŠÖ˜A
 	struct IWICImagingFactory* pWICFactory;
 	HWND hwnd;
@@ -79,4 +100,6 @@ private:
 	IDWriteFactory* pWriteFactory;
 	IDWriteTextFormat* pTextFormat;
 	ID2D1HwndRenderTarget* pRT;
+	struct IXAudio2* pXAudio2;
+	struct IXAudio2MasteringVoice* pMasterVoice;
 };
