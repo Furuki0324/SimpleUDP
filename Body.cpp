@@ -22,7 +22,7 @@ Body::Body(Game* game, int port)
 	rHandCircleComponent = new CircleComponent(this);
 	lHandCircleComponent = new CircleComponent(this);
 
-	Circle circle(50.0f);
+	Circle circle(75.0f);
 	rHandCircleComponent->SetCircle(circle);
 	lHandCircleComponent->SetCircle(circle);
 }
@@ -32,14 +32,14 @@ void Body::UpdateActor(float deltaTime)
 	D2D1_SIZE_F window = mGame->GetRenderTarget()->GetSize();
 
 	//ここでの左右は画面に向かって見た場合
-	Vector2 rightPos = udpComponent->GetPointPosition(19);		//右側の手の人差し指
+	Vector2 rightPos = udpComponent->GetPointPosition(15);		//右側の手首
 	rightPos.x *= window.width;
 	rightPos.y *= window.height;
 	rHandCircleComponent->UpdateWorldCircleTransform(rightPos);
 	rightHandVector = rightPos - prevRightHandPos;
 	prevRightHandPos = rightPos;
 
-	Vector2 leftPos = udpComponent->GetPointPosition(20);		//左側の手の人差し指
+	Vector2 leftPos = udpComponent->GetPointPosition(16);		//左側の手首
 	leftPos.x *= window.width;
 	leftPos.y *= window.height;
 	lHandCircleComponent->UpdateWorldCircleTransform(leftPos);
@@ -67,7 +67,7 @@ void Body::UpdateOnTitle(float deltaTime)
 {
 	if ((prevLeftHandPos - prevRightHandPos).Length() == 0) { return; }		//左右の手が初期位置のまま（一度もトラッキングしていない）なら処理をスキップ
 
-	if ((prevLeftHandPos - prevRightHandPos).Length() < 100.0f)
+	if ((prevLeftHandPos - prevRightHandPos).Length() < 30.0f)
 	{
 		mGame->SetScene(Game::Scene::MainGame);
 	}
@@ -83,12 +83,14 @@ void Body::UpdateOnMainGame(float deltaTime)
 		if (Intersect(rHandCircleComponent->GetWorldCircle(), block->GetBoxComponent()->GetWorldBox()))
 		{
 			block->SetHit(true);
+			//printf("Hit right hand.\n");
 			//block->GetPhysicsComponent()->AddImpact();
 		}
 
 		if (Intersect(lHandCircleComponent->GetWorldCircle(), block->GetBoxComponent()->GetWorldBox()))
 		{
 			block->SetHit(true);
+			//printf("Hit left hand.\n");
 			//block->GetPhysicsComponent()->AddImpact();
 		}
 	}
@@ -139,7 +141,7 @@ void Body::UpdateOnMainGame(float deltaTime)
 
 void Body::UpdateOnResult(float deltaTime)
 {
-	if ((prevLeftHandPos - prevRightHandPos).Length() < 100.0f)
+	if ((prevLeftHandPos - prevRightHandPos).Length() < 30.0f)
 	{
 		mGame->SetScene(Game::Scene::MainGame);
 	}

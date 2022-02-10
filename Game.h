@@ -1,6 +1,5 @@
 #pragma once
 #pragma comment(lib, "WindowsCodecs.lib")
-#pragma comment(lib, "DirectXTex.lib")
 #pragma comment(lib, "Xaudio2.lib")
 
 #include "Math.h"

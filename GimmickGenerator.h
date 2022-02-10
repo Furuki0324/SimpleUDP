@@ -12,5 +12,6 @@ public:
 
 private:
 	float passedTime;
+	float previousTime;
 	int generateCount;
 };

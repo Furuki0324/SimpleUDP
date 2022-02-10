@@ -22,7 +22,7 @@
 const unsigned int window_width = 960;
 const unsigned int window_height = 720;
 const float MIN_FRAME_TIME = 1.0f / 60;		//60FPS
-const float TIME_LIMIT = 65.0f;				//êßå¿éûä‘
+const float TIME_LIMIT = 45.0f;				//êßå¿éûä‘
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
