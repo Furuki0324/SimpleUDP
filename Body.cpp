@@ -119,7 +119,7 @@ void Body::UpdateOnMainGame(float deltaTime)
 	{
 		if (blade->GetHit())
 		{
-			printf("\x1b[41mContinue.\x1b[m\n");
+			//printf("\x1b[41mContinue.\x1b[m\n");
 			continue;
 		}
 
