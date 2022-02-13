@@ -112,7 +112,7 @@ void Body::UpdateOnMainGame(float deltaTime)
 	right *= window.width;
 	top *= window.height;
 	bottom *= window.height;
-	printf("Left:%f Right:%f Top:%f Bottom:%f\n", left, right, top, bottom);
+	//printf("Left:%f Right:%f Top:%f Bottom:%f\n", left, right, top, bottom);
 
 	auto& blades = mGame->GetBlades();
 	for (auto blade : blades)
