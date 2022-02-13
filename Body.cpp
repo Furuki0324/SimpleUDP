@@ -95,6 +95,7 @@ void Body::UpdateOnMainGame(float deltaTime)
 		}
 	}
 
+	D2D1_SIZE_F window = mGame->GetRenderTarget()->GetSize();
 	std::vector<std::vector<float>> positions = udpComponent->GetAllPosition();
 	//体の最も高い位置・低い位置・左の位置・右の位置
 	float top = 10000, bottom = 0, left = 10000, right = 0;
@@ -105,10 +106,22 @@ void Body::UpdateOnMainGame(float deltaTime)
 		if (point[2] < top) { top = point[2]; }
 		if (point[2] > bottom) { bottom = point[2]; }
 	}
+
+	//この時点ではtopなどは0~1の値なので画面サイズを掛ける
+	left *= window.width;
+	right *= window.width;
+	top *= window.height;
+	bottom *= window.height;
+	printf("Left:%f Right:%f Top:%f Bottom:%f\n", left, right, top, bottom);
+
 	auto& blades = mGame->GetBlades();
 	for (auto blade : blades)
 	{
-		if (blade->GetHit()) { continue; }
+		if (blade->GetHit())
+		{
+			printf("\x1b[41mContinue.\x1b[m\n");
+			continue;
+		}
 
 		if (blade->GetIsVertical())
 		{

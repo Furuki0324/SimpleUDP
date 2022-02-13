@@ -70,6 +70,7 @@ bool Intersect(const LineSegment& a, const Box& b)
 		//‚±‚ÌŠOÏ‚ÌÏ‚ª³‚Ì”‚Å‚ ‚ê‚ÎŒğ‚í‚Á‚Ä‚¢‚È‚¢
 		if (cross1 * cross2 > 0.0f)
 		{
+			printf("\x1b[41mCross1 continue.\x1b[m\n");
 			continue;
 		}
 
@@ -83,10 +84,12 @@ bool Intersect(const LineSegment& a, const Box& b)
 		cross2 = (bsToBe.x * bsToLe.y) - (bsToBe.y * bsToLe.x);
 		if (cross1 * cross2 > 0.0f)
 		{
+			printf("\x1b[41mCross2 continue.\x1b[m\n");
 			continue;
 		}
 
 		intersected = true;
+		printf("\x1b[41mIntersected.\x1b[m\n");
 		break;
 	}
 	return intersected;
