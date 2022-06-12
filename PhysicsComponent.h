@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "Math.h"
+//#include "Math.h"
 
 //このコンポーネントは最後に更新されるように順序を設定することを推奨します
 class PhysicsComponent : public Component

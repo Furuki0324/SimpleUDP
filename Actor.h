@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
-#include "Math.h"
+//#include <vector>
+//#include "Math.h"
 
 class Actor
 {
@@ -10,6 +10,12 @@ public:
 		EActive,
 		EPaused,
 		EDead
+	};
+
+	struct Location 
+	{
+		float X;
+		float Y;
 	};
 
 	Actor(class Game* game);

@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.h"
-#include <vector>
-#include <d2d1.h>
+//#include <vector>
+//#include <d2d1.h>
 
 class D2DDrawComponent : public Component
 {

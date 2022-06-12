@@ -8,9 +8,10 @@
 #include "D2DDrawComponent.h"
 #include "UIScreen.h"
 #include "HUD.h"
-#include <iostream>
-#include <wincodec.h>
-#include <xaudio2.h>
+//#include <iostream>
+//#include <wincodec.h>
+//#include <xaudio2.h>
+//#include <cri_adx2le.h>
 
 #define fourccRIFF 'FFIR'
 #define fourccDATA 'atad'
@@ -131,6 +132,7 @@ void Game::Shutdown()
 	SafeRelease(&pD2DFactory);
 	SafeRelease(&pRT);
 	SafeRelease(&pWriteFactory);
+
 
 	std::cout << "Shutdown" << std::endl;
 }

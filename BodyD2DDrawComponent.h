@@ -1,6 +1,6 @@
 #pragma once
 #include "D2DDrawComponent.h"
-#include "Math.h"
+//#include "Math.h"
 
 class BodyD2DDrawComponent : public D2DDrawComponent
 {

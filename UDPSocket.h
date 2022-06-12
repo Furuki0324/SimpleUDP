@@ -2,11 +2,11 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include "Component.h"
-#include "Math.h"
+//#include "Math.h"
 #include "Actor.h"
-#include <vector>
-#include <string>
-#include <Windows.h>
+//#include <vector>
+//#include <string>
+//#include <Windows.h>
 
 class UDPSocket : public Component
 {

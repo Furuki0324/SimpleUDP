@@ -1,5 +1,6 @@
 #include "Body.h"
 #include "Game.h"
+#include "SharedStruct.h"
 #include "BodyUDPComponent.h"
 #include "BodyD2DDrawComponent.h"
 #include "BoxComponent.h"
@@ -97,6 +98,7 @@ void Body::UpdateOnMainGame(float deltaTime)
 
 	D2D1_SIZE_F window = mGame->GetRenderTarget()->GetSize();
 	std::vector<std::vector<float>> positions = udpComponent->GetAllPosition();
+	std::vector<MediaPipeData> mpData = udpComponent->GetMediaPipeData();
 	//体の最も高い位置・低い位置・左の位置・右の位置
 	float top = 10000, bottom = 0, left = 10000, right = 0;
 	for (std::vector<float> point : positions)
@@ -105,6 +107,14 @@ void Body::UpdateOnMainGame(float deltaTime)
 		if (point[1] > right) { right = point[1]; }
 		if (point[2] < top) { top = point[2]; }
 		if (point[2] > bottom) { bottom = point[2]; }
+	}
+
+	for (MediaPipeData data : mpData)
+	{
+		if (data.x < left) { left = data.x; }
+		if (data.x > right) { right = data.x; }
+		if (data.y < top) { top = data.y; }
+		if (data.y > bottom) { bottom = data.y; }
 	}
 
 	//この時点ではtopなどは0~1の値なので画面サイズを掛ける

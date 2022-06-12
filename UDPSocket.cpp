@@ -1,5 +1,5 @@
 #include "UDPSocket.h"
-#include <iostream>
+//#include <iostream>
 
 UDPSocket::UDPSocket(Actor* owner, u_short inPort, int updateOrder, bool blocking = false)
 	:Component(owner, updateOrder)
